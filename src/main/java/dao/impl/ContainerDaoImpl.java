@@ -31,7 +31,8 @@ public class ContainerDaoImpl implements IContainerDao {
 
         //初始化
         Connection conn = dbcUtil.getConn();//获取连接对象
-        vo.setCreateTime(  new java.sql.Date(new Date().getTime()));//vo中设置时间
+        vo.setCreateTime( new Timestamp(System.currentTimeMillis()));//vo中设置时间
+
 
         //完成插入操作
         QueryRunner qr = new QueryRunner();
@@ -39,7 +40,8 @@ public class ContainerDaoImpl implements IContainerDao {
         String sql = "INSERT INTO container(container_id,create_admin_id,create_time,status,image) " +
                 "VALUES (?,?,?,?,?)";//定义sql插入语句
         try {
-            result = qr.update(conn,sql);
+            result = qr.update(conn,sql,vo.getContainerId(),vo.getCreateAdminId(),
+                    vo.getCreateTime(),vo.getStatus(),vo.getImage());
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {

@@ -50,7 +50,7 @@ public class ContainerServlet extends HttpServlet {
         //获取json文件路径
         String path = this.getClass().getResource("/container/json/" + containerImage + ".json").getPath();
         //docker服务器响应结果
-        JSONObject response = HttpClientUtil.doPost("", FileUtil.readJsonFile(path));
+        JSONObject response = HttpClientUtil.doPost("http://192.168.43.230:2375/containers/create", FileUtil.readJsonFile(path));
 
         //容器创建成功
         if (response != null) {
@@ -59,7 +59,7 @@ public class ContainerServlet extends HttpServlet {
             String containerId = response.getString("Id").substring(0, 12);
 
             //将创建数据写入数据库
-            Container container = null;//定义Container对象
+            Container container = new Container();//定义Container对象
             container.setContainerId(containerId);
             container.setCreateAdminId("1");//默认管理员id为1
             container.setImage(containerImage);//设置容器镜像

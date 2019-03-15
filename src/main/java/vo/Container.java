@@ -1,5 +1,6 @@
 package vo;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Date;
 public class Container {
     private String containerId;
     private String createAdminId;
-    private Date  createTime;
+    private Timestamp createTime;
 
     public int getStatus() {
         return status;
@@ -41,7 +42,7 @@ public class Container {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(Timestamp createTime) {
         this.createTime = createTime;
     }
 
