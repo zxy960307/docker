@@ -17,7 +17,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class HttpClientUtil {
     /**
-     * post请求
+     * post请求发送json数据
      * @param url
      * @param json
      * @return
@@ -28,6 +28,8 @@ public class HttpClientUtil {
         CloseableHttpResponse res = null;
         HttpPost post = new HttpPost(url);
         JSONObject response = null;
+
+        //发送json数据
         try {
             StringEntity s = new StringEntity(json.toString());
             s.setContentEncoding("UTF-8");
@@ -39,12 +41,12 @@ public class HttpClientUtil {
                 HttpEntity entity = res.getEntity();
                 String result = EntityUtils.toString(res.getEntity());// 返回json格式：
                 response = JSONObject.fromObject(result);//解析响应实体
-//                System.out.println(response.get("0").toString());
-//                System.out.println("111");
             }
             else
+            {
+                System.out.println("与docker服务器http连接异常!");
                 return null;
-
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

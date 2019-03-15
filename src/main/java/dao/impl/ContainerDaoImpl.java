@@ -33,7 +33,6 @@ public class ContainerDaoImpl implements IContainerDao {
         Connection conn = dbcUtil.getConn();//获取连接对象
         vo.setCreateTime( new Timestamp(System.currentTimeMillis()));//vo中设置时间
 
-
         //完成插入操作
         QueryRunner qr = new QueryRunner();
         int result = 0;
