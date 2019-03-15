@@ -14,6 +14,9 @@ public class Test {
         JSONObject jobj = FileUtil.readJsonFile("C:\\Users\\41463\\IdeaProjects\\docker\\src\\main\\resources\\container\\json\\mysql.json");
         //System.out.println(jobj);
         JSONObject res = HttpClientUtil.doPost("http://192.168.43.230:2375/containers/create",jobj);
+        //System.out.println(res.get("0").toString());
+        String resId = res.getString("Id");
+        //System.out.println(resId);
         System.out.println(res);
     }
     public static void main(String [] args) {

@@ -39,6 +39,8 @@ public class HttpClientUtil {
                 HttpEntity entity = res.getEntity();
                 String result = EntityUtils.toString(res.getEntity());// 返回json格式：
                 response = JSONObject.fromObject(result);//解析响应实体
+//                System.out.println(response.get("0").toString());
+//                System.out.println("111");
             }
             else
                 return null;

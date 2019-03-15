@@ -47,6 +47,7 @@ public class ContainerServlet extends HttpServlet {
         //容器创建成功
         if (response != null) {
             //获取容器id
+            //System.out.println(response.get("0").toString());
 
             //将创建数据写入数据库
         }

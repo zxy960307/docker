@@ -34,9 +34,7 @@ public class PropertyUtil {
     public static String getProperty(String key) {
         return p.getProperty(key);
     }
+    public static void main(String[] args) {
 
-    public static void main(String[] args)
-    {
-        System.out.println(PropertyUtil.getProperty("jdbc.driver"));
     }
 }
