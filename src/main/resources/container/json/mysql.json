@@ -1,0 +1,34 @@
+{
+  "Hostname": "",
+  "Domainname": "",
+  "User": "",
+  "AttachStdin": false,
+  "AttachStdout": true,
+  "AttachStderr": true,
+  "Tty": false,
+  "OpenStdin": false,
+  "StdinOnce": false,
+  "Env": [
+  ],
+  "Image": "mysql",
+  "Volumes": {},
+  "WorkingDir": "",
+  "HostConfig": {
+    "Memory": 0,
+    "MemorySwap": 0,
+    "PublishAllPorts": false,
+    "Privileged": false,
+    "Dns": [
+      "8.8.8.8"
+    ],
+    "VolumesFrom": [
+      "kind_goodall"
+    ],
+    "LogConfig": {
+      "Type": "json-file",
+      "Config": {}
+    },
+    "CgroupParent": "",
+    "VolumeDriver": ""
+  }
+}
