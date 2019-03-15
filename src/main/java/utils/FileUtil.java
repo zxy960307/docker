@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * 文件操作常用工具方法
  * Created by 41463 on 2019/3/14.
  */
-public class File {
+public class FileUtil {
     /**
      *  读取json文件，返回JSONObject对象
      * @param filePath 文件路径

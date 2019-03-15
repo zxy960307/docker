@@ -1,4 +1,4 @@
-package utils.httpclient;
+package utils;
 
 
 import net.sf.json.JSONObject;
@@ -15,7 +15,7 @@ import org.apache.http.util.EntityUtils;
 /**
  * Created by 41463 on 2019/3/14.
  */
-public class HttpClient {
+public class HttpClientUtil {
     /**
      * post请求
      * @param url

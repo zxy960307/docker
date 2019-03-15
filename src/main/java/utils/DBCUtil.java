@@ -1,18 +1,20 @@
-package utils.dbc;
+package utils;
+
+import utils.PropertyUtil;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DatabaseConnection {
-    private static final String DBDRIVER = "com.mysql.jdbc.Driver";
-    private static final String DBURL = "jdbc:mysql://localhost:3306/booksystem";
-    private static final String DBUSER = "root";
-    private static final String DBPASS = "mysqladmin";
+public class DBCUtil {
+    private static final String DBDRIVER = PropertyUtil.getProperty("jdbc.driver");
+    private static final String DBURL = PropertyUtil.getProperty("jdbc.url");
+    private static final String DBUSER = PropertyUtil.getProperty("jdbc.user");
+    private static final String DBPASS =PropertyUtil.getProperty("jdbc.password");
 
     private Connection conn;
 
-    public DatabaseConnection(){
+    public DBCUtil(){
         try {
             Class.forName(DBDRIVER);
             this.conn = DriverManager.getConnection(DBURL,DBUSER,DBPASS);

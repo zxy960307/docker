@@ -1,8 +1,8 @@
 package servlet;
 
 import net.sf.json.JSONObject;
-import utils.File;
-import utils.httpclient.HttpClient;
+import utils.FileUtil;
+import utils.HttpClientUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -42,7 +42,7 @@ public class ContainerServlet extends HttpServlet {
         //获取json文件路径
         String path = this.getClass().getResource("/container/json/"+containerImage+".json").getPath();
         //docker服务器响应结果
-        JSONObject response = HttpClient.doPost("",File.readJsonFile(path));
+        JSONObject response = HttpClientUtil.doPost("", FileUtil.readJsonFile(path));
 
         //容器创建成功
         if (response != null) {
