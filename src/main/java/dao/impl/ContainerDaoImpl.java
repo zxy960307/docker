@@ -3,15 +3,15 @@ package dao.impl;
 import dao.IContainerDao;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.MapHandler;
 import utils.DBCUtil;
 import vo.Container;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by 41463 on 2019/3/15.
@@ -66,6 +66,7 @@ public class ContainerDaoImpl implements IContainerDao {
 
     @Override
     public Container findById(String id) throws SQLException {
+
         return null;
     }
 
@@ -82,5 +83,37 @@ public class ContainerDaoImpl implements IContainerDao {
     @Override
     public Integer getAllCount(String column, String keyWord) throws SQLException {
         return null;
+    }
+
+    @Override
+    public Container findByContainerId(String containerId) throws SQLException {
+
+        //初始化
+        Connection conn = dbcUtil.getConn();//获取连接对象
+
+        //根据容器id查询数据库中记录
+        QueryRunner qr = new QueryRunner();
+        Container result = new Container();//记录查询结果
+        String sql = "SELECT * FROM container WHERE container_id=?";
+        Map<String,Object> resultMap = new HashMap<String,Object>();
+        try {
+            resultMap = qr.query(conn,sql,new MapHandler());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("通过container_id查询数据失败。");
+            return null;
+        } finally {
+            DbUtils.close(conn);
+        }
+
+        //处理结果集
+        result.setContainerId(containerId);
+        result.setStatus((Integer) resultMap.get("status"));
+        result.setImage((String)resultMap.get("image"));
+        result.setCreateAdminId((Integer) resultMap.get("create_admin_id"));
+        result.setCreateTime((Timestamp)resultMap.get("create_time"));
+        result.setId((Integer)resultMap.get("id"));
+
+        return result;
     }
 }

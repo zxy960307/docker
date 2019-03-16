@@ -13,4 +13,12 @@ public interface IContainerService {
      * @throws Exception
      */
     public boolean createContainer(Container vo) throws Exception;
+
+    /**
+     *  通过容器container_id查询容器状态
+     * @param containerId
+     * @return 容器状态，-1表示未查询到容器数据
+     * @throws Exception
+     */
+    public int queryContainerStatusByContainerId(String containerId) throws Exception;
 }

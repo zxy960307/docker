@@ -37,7 +37,7 @@ public class HttpClientUtil {
             post.setEntity(s);
             res = httpclient.execute(post);
             //消息码正常时
-            if(res.getStatusLine().getStatusCode() == 201) {
+            if(res.getStatusLine().getStatusCode() == 201 || res.getStatusLine().getStatusCode() == 204) {
                 HttpEntity entity = res.getEntity();
                 String result = EntityUtils.toString(res.getEntity());// 返回json格式：
                 response = JSONObject.fromObject(result);//解析响应实体

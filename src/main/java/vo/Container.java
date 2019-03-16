@@ -7,9 +7,15 @@ import java.util.Date;
  * Created by 41463 on 2019/3/15.
  */
 public class Container {
+
+
+
     private String containerId;
-    private String createAdminId;
+    private int createAdminId;
     private Timestamp createTime;
+    private int status;
+    private String image;
+    private int id;
 
     public int getStatus() {
         return status;
@@ -27,8 +33,13 @@ public class Container {
         this.image = image;
     }
 
-    private int status;
-    private String image;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getContainerId() {
         return containerId;
@@ -46,11 +57,11 @@ public class Container {
         this.createTime = createTime;
     }
 
-    public String getCreateAdminId() {
+    public int getCreateAdminId() {
         return createAdminId;
     }
 
-    public void setCreateAdminId(String createAdminId) {
+    public void setCreateAdminId(int createAdminId) {
         this.createAdminId = createAdminId;
     }
 }
