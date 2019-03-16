@@ -118,10 +118,12 @@ public class ContainerServlet extends HttpServlet {
 
         //获取容器状态，查询是否status == 0
         int status = -1;
+        Container result = null;
         try {
-            status = ServiceFactory.ContainerServiceInstance().
+            result = ServiceFactory.ContainerServiceInstance().
                     queryContainerStatusByContainerId(containerId);
-            if (status == -1) {
+            status = result.getStatus();
+            if (result == null ) {
                 msg = "容器信息未查询到。";
                 url = "";
                 return "";
@@ -136,9 +138,33 @@ public class ContainerServlet extends HttpServlet {
         //容器为create状态，接下来启动容器
         if (status == 0) {
             //发送start容器的Post请求
-            String machineUrl = machineIp+":2375/containers/"+containerId+"/start";
-            JSONObject response = HttpClientUtil.doPost(machineUrl,new JSONObject());
-            System.out.println(response);
+            String machineUrl = "http://"+machineIp+":2375/containers/"+containerId+"/start";
+            JSONObject response = HttpClientUtil.doPost(machineUrl);
+            if (response == null) {
+                msg = "与Docker服务通信异常，启动容器失败!";
+                url = "";
+                return "";
+            }
+            else {
+                //改变数据库中该容器status信息
+                result.setStatus(1);//修改status为1，表示正在运行
+                boolean updateStatusResult = false;
+                try {
+                    updateStatusResult = ServiceFactory.ContainerServiceInstance().
+                            updateContainerStatus(result);
+                } catch (Exception e) {
+                    msg = "数据库更新容器状态信息异常。";
+                    url = "";
+                    return "";
+                }
+                //判断是否更新成功
+                if (updateStatusResult) {
+                    msg = "容器状态更新成功。";
+                    url = "";
+                    return "";
+                }
+
+            }
 
         }
 

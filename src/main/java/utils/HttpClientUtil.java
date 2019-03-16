@@ -16,6 +16,9 @@ import org.apache.http.util.EntityUtils;
  * Created by 41463 on 2019/3/14.
  */
 public class HttpClientUtil {
+
+    private static final String userAgent = "Mozilla/5.0 (Windows NT 6.2; Win64; x64) " +
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.87 Safari/537.36";
     /**
      * post请求发送json数据
      * @param url
@@ -49,6 +52,48 @@ public class HttpClientUtil {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+        return response;
+    }
+
+    /**
+     * 发送不带参数的post请求
+     * @param url
+     * @return
+     */
+    public static JSONObject doPost(String url) {
+
+        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+        CloseableHttpResponse res = null;
+        HttpPost post = new HttpPost(url);
+        System.out.println(post);
+        post.setHeader("User-Agent",userAgent);
+        JSONObject response = null;
+
+        //发送json数据
+        try {
+            res = httpclient.execute(post);
+            //消息码正常时
+            if(res.getStatusLine().getStatusCode() == 201 || res.getStatusLine().getStatusCode() == 204) {
+                //响应实体为空时
+                try {
+                    String result = EntityUtils.toString(res.getEntity());// 返回json格式：
+                    response = JSONObject.fromObject(result);//解析响应实体
+                } catch (Exception e) {
+                    System.out.println("数据发送正常，响应数据异常");
+                    response = new JSONObject();
+                    response.put("msg","数据发送正常，响应数据异常");
+                    return response;
+                }
+            }
+            else
+            {
+                System.out.println("与docker服务器http连接异常!");
+                return null;
+            }
+        } catch (Exception e) {
+            System.out.println("与docker服务器http连接异常,数据未发送");
+            return null;
         }
         return response;
     }

@@ -20,17 +20,28 @@ public class ContainerServiceImpl implements IContainerService {
     }
 
     @Override
-    public int queryContainerStatusByContainerId(String containerId) throws Exception {
+    public Container queryContainerStatusByContainerId(String containerId) throws Exception {
 
         try {
-              Container result = ContainerFactory.ContainerInstance().findByContainerId(containerId);
+            Container result = ContainerFactory.ContainerInstance().findByContainerId(containerId);
             if (result == null)
-                return -1;
+                return null;
             else
-                return result.getStatus();
+                return result;
         } catch (Exception e) {
             e.printStackTrace();
-            return -1;
+            return null;
+        }
+    }
+
+    @Override
+    public boolean updateContainerStatus(Container vo) throws Exception {
+
+        try {
+            return  ContainerFactory.ContainerInstance().doUpdate(vo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

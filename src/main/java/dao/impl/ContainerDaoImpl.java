@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class ContainerDaoImpl implements IContainerDao {
 
-    public DBCUtil dbcUtil = new DBCUtil();
+    Connection conn = new DBCUtil().getConn();//连接对象
     /**
      * 数据表中创建容器记录
      * @param vo 表示要执行操作的对象
@@ -30,7 +30,6 @@ public class ContainerDaoImpl implements IContainerDao {
     public boolean doCreate(Container vo) throws SQLException {
 
         //初始化
-        Connection conn = dbcUtil.getConn();//获取连接对象
         vo.setCreateTime( new Timestamp(System.currentTimeMillis()));//vo中设置时间
 
         //完成插入操作
@@ -56,6 +55,27 @@ public class ContainerDaoImpl implements IContainerDao {
 
     @Override
     public boolean doUpdate(Container vo) throws SQLException {
+
+        //更新字段
+        QueryRunner qr = new QueryRunner();
+        int result = 0;
+        String sql = "UPDATE container SET container_id=?,create_admin_id=?," +
+                "create_time=?,image=?,status = ? WHERE id = ?";
+        Object[] params = {vo.getContainerId(),vo.getCreateAdminId(),vo.getCreateTime(),
+                            vo.getImage(),vo.getStatus(),vo.getId()};
+        try {
+            result = qr.update(conn,sql,params);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DbUtils.close(conn);
+        }
+
+        //检查结果
+        if (result != 0) {
+            return true;
+        }
+
         return false;
     }
 
@@ -89,15 +109,15 @@ public class ContainerDaoImpl implements IContainerDao {
     public Container findByContainerId(String containerId) throws SQLException {
 
         //初始化
-        Connection conn = dbcUtil.getConn();//获取连接对象
 
         //根据容器id查询数据库中记录
         QueryRunner qr = new QueryRunner();
         Container result = new Container();//记录查询结果
         String sql = "SELECT * FROM container WHERE container_id=?";
+        //Object params[] = {containerId};
         Map<String,Object> resultMap = new HashMap<String,Object>();
         try {
-            resultMap = qr.query(conn,sql,new MapHandler());
+            resultMap = qr.query(conn,sql,new MapHandler(),containerId);
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("通过container_id查询数据失败。");
@@ -112,7 +132,10 @@ public class ContainerDaoImpl implements IContainerDao {
         result.setImage((String)resultMap.get("image"));
         result.setCreateAdminId((Integer) resultMap.get("create_admin_id"));
         result.setCreateTime((Timestamp)resultMap.get("create_time"));
-        result.setId((Integer)resultMap.get("id"));
+        long idLong = (long)resultMap.get("id");
+        int id = new Integer(String.valueOf(idLong));
+        result.setId(id);
+        System.out.println(result);
 
         return result;
     }
