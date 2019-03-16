@@ -92,7 +92,7 @@ public class HttpClientUtil {
                 return null;
             }
         } catch (Exception e) {
-            System.out.println("与docker服务器http连接异常,数据未发送");
+            System.out.println("与docker服务器http连接异常,数据未发送!");
             return null;
         }
         return response;

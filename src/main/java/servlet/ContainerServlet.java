@@ -5,6 +5,7 @@ import factory.ServiceFactory;
 import net.sf.json.JSONObject;
 import service.Impl.ContainerServiceImpl;
 import utils.FileUtil;
+import utils.GeneralUtil;
 import utils.HttpClientUtil;
 import vo.Container;
 
@@ -109,14 +110,14 @@ public class ContainerServlet extends HttpServlet {
         //获取请求参数并检查数据
         String containerId = req.getParameter("containerId");
         String machineIp = req.getParameter("machineIp");
-        if (containerId == null || containerId.equals("")||
-                machineIp == null || machineIp.equals("")) {
+        if (GeneralUtil.isStrEmpty(containerId)||
+                GeneralUtil.isStrEmpty(machineIp)) {
             msg = "容器id不能为空";
             url = "";
             return "";
         }
 
-        //获取容器状态，查询是否status == 0
+        //获取容器状态status
         int status = -1;
         Container result = null;
         try {
@@ -135,7 +136,7 @@ public class ContainerServlet extends HttpServlet {
             return "";
         }
 
-        //容器为create状态，接下来启动容器
+        //判断容器是否为create状态，并启动容器
         if (status == 0) {
             //发送start容器的Post请求
             String machineUrl = "http://"+machineIp+":2375/containers/"+containerId+"/start";
@@ -167,14 +168,12 @@ public class ContainerServlet extends HttpServlet {
             }
 
         }
-
         //容器在其他状态，不能启动
         else {
             msg = "容器处于xx状态，不能启动。";
             url = "";
             return "";
         }
-
         return "";
     }
 
