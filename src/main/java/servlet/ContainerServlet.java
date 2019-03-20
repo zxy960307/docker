@@ -1,12 +1,11 @@
 package servlet;
 
-import dao.IContainerDao;
 import factory.ServiceFactory;
 import net.sf.json.JSONObject;
-import service.Impl.ContainerServiceImpl;
 import utils.FileUtil;
 import utils.GeneralUtil;
 import utils.HttpClientUtil;
+import utils.PropertyUtil;
 import vo.Container;
 
 import javax.servlet.ServletException;
@@ -14,8 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by 41463 on 2019/3/14.
@@ -124,7 +121,7 @@ public class ContainerServlet extends HttpServlet {
         Container result = null;
         try {
             result = ServiceFactory.ContainerServiceInstance().
-                    queryContainerStatusByContainerId(containerId);
+                    queryContainerByContainerId(containerId);
             status = result.getStatus();
             if (result == null ) {
                 msg = "容器信息未查询到。";
@@ -154,7 +151,7 @@ public class ContainerServlet extends HttpServlet {
                 boolean updateStatusResult = false;
                 try {
                     updateStatusResult = ServiceFactory.ContainerServiceInstance().
-                            updateContainerStatus(result);
+                            updateContainer(result);
                 } catch (Exception e) {
                     msg = "数据库更新容器状态信息异常。";
                     url = "";
@@ -191,10 +188,11 @@ public class ContainerServlet extends HttpServlet {
         String msg = ""; //表示提示信息
         String url = ""; // 表示跳转路径
 
-        //获取数据库中所有已注册容器container_id
-        String containerID[];
+        //获取数据库中所有已注册容器的container_id
+        Container[] containers;//存放查询结果
         try {
-            containerID = ServiceFactory.ContainerServiceInstance().getAllContainersContainerId();
+            containers = ServiceFactory.ContainerServiceInstance().
+                    getAllContainersByContainerId();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -204,22 +202,42 @@ public class ContainerServlet extends HttpServlet {
         }
 
         //与docker服务器通信，获取所有容器信息并进行处理
-        String[] urlArray = new String[containerID.length];
+        String[] urlArray = new String[containers.length];//存放url
         int length = 0;
-        for (String container:containerID) {
-            urlArray[length] = "http://192.168.43.230:2375/containers/"+container+"/json";
+        for (Container container:containers) {
+            urlArray[length] = "http://192.168.43.230:2375/containers/"+container.getContainerId()+"/json";
             length ++;
         }
-
-        Map<String,Object> containersInfo = new HashMap<>();
+        JSONObject[]  res = new JSONObject[containers.length];//将get结果放至JSONObject数组中
         for (int i =0;i<length;i++) {
-            JSONObject result = HttpClientUtil.doGet(urlArray[i]);
+            res[i] = HttpClientUtil.doGet(urlArray[i]);
+        }
 
-            containersInfo.put(containerID[i],result);
+        //修改刷新的数据status等
+        for (int i=0;i<containers.length;i++) {
+            JSONObject state =  (JSONObject) res[i].get("State");
+            String status = (String)state.get("Status");
+            containers[i].setStatus(Integer.parseInt(PropertyUtil.getProperty(status)));
+            System.out.println(status);//exited:2 created :0
         }
 
         //修改数据库中内容
-
+        for (int i =0;i<containers.length;i++) {
+            try {
+                boolean flag =ServiceFactory.ContainerServiceInstance().updateContainer(containers[i]);
+                if (!flag) {
+                    msg = "更新容器信息失败。";
+                    url = "";
+                    return "";
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                msg = "更新容器信息异常。";
+                url = "";
+                return "";
+            }
+        }
         return "";
     }
 }

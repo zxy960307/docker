@@ -22,7 +22,7 @@ public class ContainerServiceImpl implements IContainerService {
     }
 
     @Override
-    public Container queryContainerStatusByContainerId(String containerId) throws Exception {
+    public Container queryContainerByContainerId(String containerId) throws Exception {
 
         try {
             Container result = ContainerFactory.ContainerInstance().findByContainerId(containerId);
@@ -47,7 +47,7 @@ public class ContainerServiceImpl implements IContainerService {
     }
 
     @Override
-    public boolean updateContainerStatus(Container vo) throws Exception {
+    public boolean updateContainer(Container vo) throws Exception {
 
         try {
             return  ContainerFactory.ContainerInstance().doUpdate(vo);
@@ -58,14 +58,14 @@ public class ContainerServiceImpl implements IContainerService {
     }
 
     @Override
-    public String[] getAllContainersContainerId() throws Exception {
+    public Container[] getAllContainersByContainerId() throws Exception {
 
         try {
             List<Container> resultAll = ContainerFactory.ContainerInstance().findAll();
-            String[] resultContainerId = new String[resultAll.size()];
+            Container[] resultContainerId = new Container[resultAll.size()];
             int length = 0;
             for (Container container:resultAll) {
-                resultContainerId[length] = container.getContainerId();
+                resultContainerId[length] = container;
                 length ++;
             }
             return resultContainerId;
