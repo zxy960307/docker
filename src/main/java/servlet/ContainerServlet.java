@@ -178,11 +178,30 @@ public class ContainerServlet extends HttpServlet {
     }
 
     /**
-     * 重启服务器后更新容器信息
+     * 更新所有容器信息
      * @param req
      * @return
      */
     public String updateContainer(HttpServletRequest req) {
+
+
+        //初始化
+        String msg = ""; //表示提示信息
+        String url = ""; // 表示跳转路径
+
+        //获取数据库中所有已注册容器container_id
+        try {
+            String containerID[] = ServiceFactory.ContainerServiceInstance().getAllContainersContainerId();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            msg = "获取所有容器信息异常。";
+            url = "";
+            return "";
+        }
+
+        //与docker服务器通信，获取所有容器信息并进行处理
+
 
         return "";
     }

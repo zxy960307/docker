@@ -2,6 +2,8 @@ package service;
 
 import vo.Container;
 
+import java.util.List;
+
 /**
  * Created by 41463 on 2019/3/15.
  */
@@ -30,4 +32,16 @@ public interface IContainerService {
      * @throws Exception
      */
     public boolean updateContainerStatus(Container vo) throws Exception;
+
+    /**
+     * 获取所有容器信息
+     * @return
+     * @throws Exception
+     */
+    public List<Container> getAllContainers() throws Exception;
+
+    /**
+     *  获得所有容器container_id
+     */
+    public String[] getAllContainersContainerId() throws Exception;
 }

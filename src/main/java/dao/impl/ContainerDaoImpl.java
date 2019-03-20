@@ -4,7 +4,9 @@ import dao.IContainerDao;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.dbutils.handlers.MapHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
 import utils.DBCUtil;
 import vo.Container;
 
@@ -92,7 +94,39 @@ public class ContainerDaoImpl implements IContainerDao {
 
     @Override
     public List<Container> findAll() throws SQLException {
-        return null;
+        //定义List存放结果
+        List<Object[]> result = new ArrayList<>();
+        Object[] objes;
+
+        //获得表中所有信息
+        QueryRunner qr = new QueryRunner();
+        String sql = "SELECT * FROM container";
+        try {result=qr.query(conn,sql,new ArrayListHandler());
+        } catch (SQLException e) {
+            System.out.println("获取container表所有信息异常。");
+            e.printStackTrace();
+        } finally {
+            DbUtils.close(conn);
+        }
+
+        //封装结果
+        if (result == null) {
+            System.out.println("获取container表所有信息为空。");
+            return null;
+        }
+        List<Container> containerResult = new ArrayList<>();//存放封装后的结果
+        for(Object[] container:result) {
+            Container temp = new Container();
+            temp.setId((Integer) container[0]);
+            temp.setContainerId((String) container[1]);
+            temp.setCreateAdminId((Integer)container[2]);
+            temp.setCreateTime((Timestamp)container[3]);
+            temp.setStatus((Integer)container[4]);
+            temp.setImage((String)container[5]);
+            containerResult.add(temp);
+        }
+
+        return containerResult;
     }
 
     @Override
