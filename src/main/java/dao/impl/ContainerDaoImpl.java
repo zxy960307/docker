@@ -117,7 +117,7 @@ public class ContainerDaoImpl implements IContainerDao {
         List<Container> containerResult = new ArrayList<>();//存放封装后的结果
         for(Object[] container:result) {
             Container temp = new Container();
-            temp.setId((Integer) container[0]);
+            temp.setId(Integer.parseInt(String.valueOf(container[0])));
             temp.setContainerId((String) container[1]);
             temp.setCreateAdminId((Integer)container[2]);
             temp.setCreateTime((Timestamp)container[3]);
@@ -126,6 +126,7 @@ public class ContainerDaoImpl implements IContainerDao {
             containerResult.add(temp);
         }
 
+        System.out.println(containerResult);
         return containerResult;
     }
 

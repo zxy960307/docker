@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by 41463 on 2019/3/14.
@@ -37,8 +39,8 @@ public class ContainerServlet extends HttpServlet {
             else if ("startContainer".equals(status)) {
                 this.startContainer(req);
             }
-            else if ("updateContainer".equals(status)) {
-                this.updateContainer(req);
+            else if ("updateContainers".equals(status)) {
+                this.updateContainers(req);
             }
         }
         //req.getRequestDispatcher(path).forward(request,response);
@@ -178,11 +180,11 @@ public class ContainerServlet extends HttpServlet {
     }
 
     /**
-     * 更新所有容器信息
+     * 更新所有容器信息,并更新数据库
      * @param req
      * @return
      */
-    public String updateContainer(HttpServletRequest req) {
+    public String updateContainers(HttpServletRequest req) {
 
 
         //初始化
@@ -190,8 +192,9 @@ public class ContainerServlet extends HttpServlet {
         String url = ""; // 表示跳转路径
 
         //获取数据库中所有已注册容器container_id
+        String containerID[];
         try {
-            String containerID[] = ServiceFactory.ContainerServiceInstance().getAllContainersContainerId();
+            containerID = ServiceFactory.ContainerServiceInstance().getAllContainersContainerId();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -201,7 +204,21 @@ public class ContainerServlet extends HttpServlet {
         }
 
         //与docker服务器通信，获取所有容器信息并进行处理
+        String[] urlArray = new String[containerID.length];
+        int length = 0;
+        for (String container:containerID) {
+            urlArray[length] = "http://192.168.43.230:2375/containers/"+container+"/json";
+            length ++;
+        }
 
+        Map<String,Object> containersInfo = new HashMap<>();
+        for (int i =0;i<length;i++) {
+            JSONObject result = HttpClientUtil.doGet(urlArray[i]);
+
+            containersInfo.put(containerID[i],result);
+        }
+
+        //修改数据库中内容
 
         return "";
     }
