@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by 41463 on 2019/3/14.
@@ -21,11 +23,12 @@ public class ContainerServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
+        this.doPost(req, resp);
     }
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String path = "/pages/errors.jsp"; // 定义错误页面
         //获取跳转值
         String status = req.getRequestURI().substring(req.getRequestURI().lastIndexOf("/")+1);
         //跳转
@@ -39,8 +42,11 @@ public class ContainerServlet extends HttpServlet {
             else if ("updateContainers".equals(status)) {
                 this.updateContainers(req);
             }
+            else if ("getAllContainers".equals(status)) {
+                path = this.getAllContainers(req);
+            }
         }
-        //req.getRequestDispatcher(path).forward(request,response);
+        req.getRequestDispatcher(path).forward(req,resp);
     }
 
     /**
@@ -240,4 +246,36 @@ public class ContainerServlet extends HttpServlet {
         }
         return "";
     }
+
+    public String getAllContainers(HttpServletRequest req) {
+        //初始化
+        String msg = ""; //表示提示信息
+        String url = ""; // 表示跳转路径
+
+        //调用相关函数从数据库获取所有信息
+        List<Container> containers = new ArrayList<>();
+        try {
+            containers = ServiceFactory.ContainerServiceInstance().getAllContainers();
+        } catch (Exception e) {
+            e.printStackTrace();
+            msg = "获取容器信息异常。";
+            url = "";
+            return "";
+        }
+        //检查结果
+        if (containers.size()<=0) {
+            msg = "获取容器信息为空。";
+            url = "";
+            return "";
+        }
+
+        //封装结果
+        req.setAttribute("allContainers",containers);
+
+        return "/pages/container/container_list.jsp";
+    }
+    public String restartContainer(HttpServletRequest req) {
+        return "";
+    }
+
 }

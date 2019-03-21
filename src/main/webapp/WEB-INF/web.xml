@@ -20,4 +20,5 @@
     <servlet-name>container</servlet-name>
     <url-pattern>/container/*</url-pattern>
   </servlet-mapping>
+  <!--配置jstl-->
 </web-app>
