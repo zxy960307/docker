@@ -4,6 +4,7 @@ import dao.IDAO;
 import vo.Container;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Created by 41463 on 2019/3/15.
@@ -16,4 +17,15 @@ public interface IContainerDao extends IDAO<String, Container>{
      * @throws SQLException
      */
     public Container findByContainerId(String containerId) throws SQLException;
+
+    /**
+     *  分页查询容器信息
+     * @param clown
+     * @param keyWord
+     * @param currentPage
+     * @param lineSize
+     * @return
+     * @throws SQLException
+     */
+    public List<Container> getAllContainersPag(String clown, String keyWord, Integer currentPage, Integer lineSize) throws SQLException;
 }

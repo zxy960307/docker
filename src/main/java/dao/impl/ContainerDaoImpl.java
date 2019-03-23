@@ -7,6 +7,7 @@ import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import utils.DBCUtil;
 import vo.Container;
 
@@ -96,7 +97,6 @@ public class ContainerDaoImpl implements IContainerDao {
     public List<Container> findAll() throws SQLException {
         //定义List存放结果
         List<Object[]> result = new ArrayList<>();
-        Object[] objes;
 
         //获得表中所有信息
         QueryRunner qr = new QueryRunner();
@@ -137,7 +137,21 @@ public class ContainerDaoImpl implements IContainerDao {
 
     @Override
     public Integer getAllCount(String column, String keyWord) throws SQLException {
-        return null;
+
+        String sql = "SELECT COUNT(*) FROM container WHERE " + column + " LIKE ? AND status <> 6";
+        QueryRunner qr = new QueryRunner();
+        Integer result = 0;
+        try {
+            result = Integer.parseInt(String.valueOf(qr.query(conn,sql,new ScalarHandler(),"%" + keyWord + "%")));
+        }catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("查询所有status!=6的容器数量失败。");
+            return null;
+        } finally {
+            DbUtils.close(conn);
+        }
+
+        return result;
     }
 
     @Override
@@ -173,5 +187,45 @@ public class ContainerDaoImpl implements IContainerDao {
         System.out.println(result);
 
         return result;
+    }
+
+    @Override
+    public List<Container> getAllContainersPag(String clown, String keyWord, Integer currentPage, Integer lineSize) throws SQLException {
+
+        //查询所有status!=6的容器
+        List<Object[]> result = new ArrayList<>();
+        QueryRunner qr = new QueryRunner();
+        String sql = "SELECT * FROM container WHERE " + clown + " LIKE ? AND status <> 6 LIMIT ?,?";
+        Object[] params = new Object[3];
+        params[0]="%" + keyWord + "%";
+        params[1]=(currentPage.intValue() - 1) * lineSize.intValue();
+        params[2] = currentPage.intValue() * lineSize.intValue();
+        try {result=qr.query(conn,sql,new ArrayListHandler(),params);
+        } catch (SQLException e) {
+            System.out.println("分页获取container表所有信息异常。");
+            e.printStackTrace();
+        } finally {
+            DbUtils.close(conn);
+        }
+
+        //封装结果
+        //判断结果是否为空
+        if (result.size() <= 0) {
+            System.out.println("获取container表所有信息为空。");
+            return null;
+        }
+        List<Container> containerResult = new ArrayList<>();//存放封装后的结果
+        for(Object[] container:result) {
+            Container temp = new Container();
+            temp.setId(Integer.parseInt(String.valueOf(container[0])));
+            temp.setContainerId((String) container[1]);
+            temp.setCreateAdminId((Integer)container[2]);
+            temp.setCreateTime((Timestamp)container[3]);
+            temp.setStatus((Integer)container[4]);
+            temp.setImage((String)container[5]);
+            containerResult.add(temp);
+        }
+
+        return containerResult;
     }
 }

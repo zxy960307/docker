@@ -247,15 +247,44 @@ public class ContainerServlet extends HttpServlet {
         return "";
     }
 
+    /**
+     * 分页获取所有容器信息
+     * @param req
+     * @return
+     */
     public String getAllContainers(HttpServletRequest req) {
+
         //初始化
         String msg = ""; //表示提示信息
         String url = ""; // 表示跳转路径
+        Integer currentPage = Integer.valueOf(1);
+        Integer lineSize = Integer.valueOf(4);
+
+        try {
+           currentPage = Integer.valueOf(Integer.parseInt(req.getParameter("cp"))); } catch (Exception localException1) {
+         }
+        try {
+           lineSize = Integer.valueOf(Integer.parseInt(req.getParameter("ls"))); } catch (Exception localException2) {
+             }
+             String keyWord = req.getParameter("kw");
+             String column = req.getParameter("col");
+             if (keyWord == null)
+             {
+               keyWord = "";
+             }
+             if (column == null)
+             {
+               column = "container_id";
+             }
 
         //调用相关函数从数据库获取所有信息
         List<Container> containers = new ArrayList<>();
+        Integer allRecorders = 0;
         try {
-            containers = ServiceFactory.ContainerServiceInstance().getAllContainers();
+            containers = (List<Container>) ServiceFactory.ContainerServiceInstance().
+                    getAllContainersPag(column, keyWord, currentPage, lineSize).get("containers");
+            allRecorders=(Integer)ServiceFactory.ContainerServiceInstance().
+                    getAllContainersPag(column, keyWord, currentPage, lineSize).get("counts");
         } catch (Exception e) {
             e.printStackTrace();
             msg = "获取容器信息异常。";
@@ -270,7 +299,11 @@ public class ContainerServlet extends HttpServlet {
         }
 
         //封装结果
+        req.setAttribute("url", "/container/getAllContainers");
+        req.setAttribute("currentPage", currentPage);
+        req.setAttribute("lineSize", lineSize);
         req.setAttribute("allContainers",containers);
+        req.setAttribute("allRecorders",allRecorders);
 
         return "/pages/container/container_list.jsp";
     }

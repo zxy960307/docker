@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="my" uri="/WEB-INF/returnstatusstr.tld"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page isELIgnored="false" %>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -51,7 +52,8 @@
                         <c:forEach items="${allContainers}" var="container">
                             <tr>
                                 <td>${container.containerId}</td>
-                                <td>${container.status}</td>
+                                <td>${my:returnstatusstr(container.status)}</td>
+                                <%--<td>${container.status}</td>--%>
                                 <td>${container.image}</td>
                                 <td>${container.createAdminId}</td>
                                 <td>${container.createTime}</td>
@@ -63,24 +65,38 @@
                                         <span class="glyphicon glyphicon-wrench"></span>
                                     </button>
                                     <ul class="dropdown-menu" role="menu">
-                                        <li>
-                                            <a href="#">启动</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">暂停</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">重启</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">删除</a>
-                                        </li>
+                                        <c:if test="${container.status==0 ||container.status==2 }">
+                                            <li>
+                                                <a href="#">启动</a>
+                                            </li>
+                                        </c:if>
+                                        <c:if test="${container.status==1 }">
+                                            <li>
+                                                <a href="#">暂停</a>
+                                            </li>
+                                        </c:if>
+                                        <c:if test="${container.status==3}">
+                                            <li>
+                                                <a href="#">取消暂停</a>
+                                            </li>
+                                        </c:if>
+                                        <c:if test="${container.status==0 ||container.status==2 }">
+                                            <li>
+                                                <a href="#">重启</a>
+                                            </li>
+                                        </c:if>
+                                            <li>
+                                                <a href="#">删除</a>
+                                            </li>
                                     </ul>
                                 </div></td>
                             </tr>
                         </c:forEach>
                         </tbody>
                     </table>
+                    <div class="col-md-5 col-md-offset-4">
+                        <jsp:include page="/pages/split_bar.jsp"></jsp:include>
+                    </div>
                 </div>
             </div>
         </div>

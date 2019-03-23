@@ -16,4 +16,27 @@ public class GeneralUtil {
         else
         return false;
     }
+
+    /**
+     * 返回容器status对应的String字符串
+     * @param status
+     * @return
+     */
+    public static String returnStatusStr(Integer status) {
+        if (status == 0)
+            return "created";
+        else if(status == 1)
+            return "running";
+        else if(status == 2)
+            return "exited";
+        else if(status == 3)
+            return "paused";
+        else if(status == 4)
+            return "restarting";
+        else if(status == 5)
+            return "removing";
+        else if(status == 6)
+            return "dead";
+        return "unknown status";
+    }
 }

@@ -3,6 +3,7 @@ package service;
 import vo.Container;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by 41463 on 2019/3/15.
@@ -33,7 +34,7 @@ public interface IContainerService {
     public boolean updateContainer(Container vo) throws Exception;
 
     /**
-     * 获取所有容器信息
+     * 向docker服务器获取所有容器信息
      * @return
      * @throws Exception
      */
@@ -43,4 +44,16 @@ public interface IContainerService {
      *  获得所有容器container_id
      */
     public Container[] getAllContainersByContainerId() throws Exception;
+
+    /**
+     *  分页向mysql数据库获取所有容器信息
+     * @param paramString1
+     * @param paramString2
+     * @param paramInteger1
+     * @param paramInteger2
+     * @return
+     * @throws Exception
+     */
+    public Map<String,Object> getAllContainersPag(String paramString1, String paramString2,
+                                                  Integer paramInteger1, Integer paramInteger2) throws Exception;
 }
