@@ -39,11 +39,6 @@
                         </div>
                         <br>
                         <div class="input-group col-lg-8 col-md-offset-2">
-                            <span class="input-group-addon">image</span>
-                            <input type="text" class="form-control">
-                        </div>
-                        <br>
-                        <div class="input-group col-lg-8 col-md-offset-2">
                             <%--<label for="imageSelect">选择列表</label>--%>
                             <span class="input-group-addon">image</span>
                             <select class="form-control" id="imageSelect">
@@ -54,10 +49,17 @@
                                 <option>5</option>
                             </select>
                         </div>
-                        </br>
+                        <br>
                         <div class="input-group col-lg-8 col-md-offset-2">
+                            <%--<label for="imageSelect">选择列表</label>--%>
                             <span class="input-group-addon">machine</span>
-                            <input type="text" class="form-control">
+                            <select class="form-control" id="imageSelect">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                            </select>
                         </div>
                             </br>
                             <div class="input-group col-lg-6 col-md-offset-2">

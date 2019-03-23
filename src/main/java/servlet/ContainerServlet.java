@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -40,7 +41,8 @@ public class ContainerServlet extends HttpServlet {
                 this.startContainer(req);
             }
             else if ("updateContainers".equals(status)) {
-                this.updateContainers(req);
+                this.updateContainers(req,resp);
+                return;
             }
             else if ("getAllContainers".equals(status)) {
                 path = this.getAllContainers(req);
@@ -187,25 +189,29 @@ public class ContainerServlet extends HttpServlet {
      * @param req
      * @return
      */
-    public String updateContainers(HttpServletRequest req) {
+    public void updateContainers(HttpServletRequest req ,HttpServletResponse resp) {
 
 
         //初始化
+        boolean msgStatus = true;
         String msg = ""; //表示提示信息
         String url = ""; // 表示跳转路径
+        resp.setContentType("text/html");
+        resp.setCharacterEncoding("utf-8");
 
         //获取数据库中所有已注册容器的container_id
         Container[] containers;//存放查询结果
+        List<Container> containersList = new ArrayList<>();
         try {
-            containers = ServiceFactory.ContainerServiceInstance().
-                    getAllContainersByContainerId();
+            containersList = Arrays.asList(ServiceFactory.ContainerServiceInstance().
+                    getAllContainersByContainerId());
         }
         catch (Exception e) {
             e.printStackTrace();
             msg = "获取所有容器信息异常。";
-            url = "";
-            return "";
+            msgStatus = false;
         }
+        containers = (Container[]) containersList.toArray();
 
         //与docker服务器通信，获取所有容器信息并进行处理
         String[] urlArray = new String[containers.length];//存放url
@@ -233,18 +239,28 @@ public class ContainerServlet extends HttpServlet {
                 boolean flag =ServiceFactory.ContainerServiceInstance().updateContainer(containers[i]);
                 if (!flag) {
                     msg = "更新容器信息失败。";
-                    url = "";
-                    return "";
+                    msgStatus = false;
                 }
             }
             catch (Exception e) {
                 e.printStackTrace();
                 msg = "更新容器信息异常。";
-                url = "";
-                return "";
+                msgStatus = false;
             }
         }
-        return "";
+
+        String jsonStr = "{\"msg\":\""+msg+"\"}";
+        msg = "同Docker服务器更新数据成功";
+        JSONObject msgJson = new JSONObject();
+
+        try {
+            resp.getWriter().write(msg);
+            System.out.println("resp成功");
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+            System.out.println("resp失败");
+        }
     }
 
     /**
@@ -255,8 +271,8 @@ public class ContainerServlet extends HttpServlet {
     public String getAllContainers(HttpServletRequest req) {
 
         //初始化
+        boolean msgStatus = true;//表示执行状态
         String msg = ""; //表示提示信息
-        String url = ""; // 表示跳转路径
         Integer currentPage = Integer.valueOf(1);
         Integer lineSize = Integer.valueOf(4);
 
@@ -287,15 +303,13 @@ public class ContainerServlet extends HttpServlet {
                     getAllContainersPag(column, keyWord, currentPage, lineSize).get("counts");
         } catch (Exception e) {
             e.printStackTrace();
-            msg = "获取容器信息异常。";
-            url = "";
-            return "";
+            msg = "获取容器信息列表异常。";
+            msgStatus = false;
         }
         //检查结果
         if (containers.size()<=0) {
-            msg = "获取容器信息为空。";
-            url = "";
-            return "";
+            msg = "获取容器信息列表为空。";
+            msgStatus = false;
         }
 
         //封装结果
@@ -304,8 +318,13 @@ public class ContainerServlet extends HttpServlet {
         req.setAttribute("lineSize", lineSize);
         req.setAttribute("allContainers",containers);
         req.setAttribute("allRecorders",allRecorders);
+        req.setAttribute("msg",msg);
 
-        return "/pages/container/container_list.jsp";
+        //定义跳转网页url
+        if (msgStatus == true)
+            return "/pages/container/container_list.jsp";
+        else
+            return "/pages/index.jsp";
     }
     public String restartContainer(HttpServletRequest req) {
         return "";
