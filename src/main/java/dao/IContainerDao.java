@@ -28,4 +28,6 @@ public interface IContainerDao extends IDAO<String, Container>{
      * @throws SQLException
      */
     public List<Container> getAllContainersPag(String clown, String keyWord, Integer currentPage, Integer lineSize) throws SQLException;
+
+    public boolean updateContainerStatus(int status,String containerId) throws SQLException;
 }

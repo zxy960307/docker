@@ -22,7 +22,6 @@
 <body>
 <div id="wrapper">
     <jsp:include page="/pages/header.jsp"></jsp:include>
-
     <!-- 此处编写内容  -->
     <div id="page-wrapper">
         <div id="page-inner" style="padding: 50px 100px 0px;">
@@ -32,17 +31,17 @@
                 </div>
                 <div class="panel-body">
                     <div style="padding: 50px 100px 10px;">
-                        <br class="bs-example bs-example-form" role="form">
+                        <form class="bs-example bs-example-form" role="form" method="get" action="/container/createContainer">
                         <div class="input-group col-lg-8 col-md-offset-2">
                             <span class="input-group-addon">name</span>
-                            <input type="text" class="form-control " placeholder="twitterhandle">
+                            <input type="text" class="form-control " placeholder="twitterhandle" name="name">
                         </div>
                         <br>
                         <div class="input-group col-lg-8 col-md-offset-2">
                             <%--<label for="imageSelect">选择列表</label>--%>
                             <span class="input-group-addon">image</span>
-                            <select class="form-control" id="imageSelect">
-                                <option>1</option>
+                            <select class="form-control" id="imageSelect" name="image">
+                                <option value="mysql" selected="selected">mysql</option>
                                 <option>2</option>
                                 <option>3</option>
                                 <option>4</option>
@@ -53,8 +52,8 @@
                         <div class="input-group col-lg-8 col-md-offset-2">
                             <%--<label for="imageSelect">选择列表</label>--%>
                             <span class="input-group-addon">machine</span>
-                            <select class="form-control" id="imageSelect">
-                                <option>1</option>
+                            <select class="form-control" id="machineSelect" name="machine">
+                                <option value="192.168.43.230:2375" selected="selected">pc2:192.168.43.230</option>
                                 <option>2</option>
                                 <option>3</option>
                                 <option>4</option>
@@ -64,7 +63,7 @@
                             </br>
                             <div class="input-group col-lg-6 col-md-offset-2">
                                 <div class="col-lg-8 col-md-offset-2">
-                                    <button type="button" class="btn btn-lg btn-info col-md-offset-2 btn-block">创建</button>
+                                    <button type="submit" class="btn btn-lg btn-info col-md-offset-2 btn-block">创建</button>
                                 </div>
                             </div>
                         </form>
@@ -89,6 +88,10 @@
     //            title:'创建容器',
     //        });
     //    })
+    window.onload= function(){
+        if ("${alertFlag}" == "true")
+                alert("${msg}");
+    }
 </script>
 </body>
 </html>

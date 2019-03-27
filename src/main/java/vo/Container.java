@@ -17,6 +17,16 @@ public class Container {
     private String image;
     private int id;
 
+    public String getMachineIp() {
+        return machineIp;
+    }
+
+    public void setMachineIp(String machineIp) {
+        this.machineIp = machineIp;
+    }
+
+    private String machineIp;
+
     public int getStatus() {
         return status;
     }

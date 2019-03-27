@@ -6,6 +6,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -129,6 +130,42 @@ public class HttpClientUtil {
             }
         }
         catch (IOException e) {
+            System.out.println("与docker服务器http连接异常,数据未发送!");
+            return null;
+        }
+
+        return response;
+    }
+
+    //执行delete请求
+    public static JSONObject doDelete(String url) {
+
+        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+        CloseableHttpResponse res = null;
+        HttpDelete delete = new HttpDelete(url);
+        JSONObject response = null;
+
+        try {
+            res = httpclient.execute(delete);
+            if(res.getStatusLine().getStatusCode() == 204) {
+                try {
+                    String result = EntityUtils.toString(res.getEntity());// 返回json格式：
+                    response = JSONObject.fromObject(result);//解析响应实体
+                    response.put("result",true);
+                } catch (Exception e) {
+                    System.out.println("数据发送正常，响应数据异常");
+                    response = new JSONObject();
+                    response.put("msg","数据发送正常，响应数据异常");
+                    response.put("result",false);
+                    return response;
+                }
+            }
+            else
+            {
+                System.out.println("与docker服务器http连接异常!");
+                return null;
+            }
+        } catch (Exception e) {
             System.out.println("与docker服务器http连接异常,数据未发送!");
             return null;
         }

@@ -35,7 +35,7 @@ public class ContainerServlet extends HttpServlet {
         //跳转
         if(status != null) {
             if("createContainer".equals(status)) {
-                 this.createContainer(req);
+                 path = this.createContainer(req);
             }
             else if ("startContainer".equals(status)) {
                 this.startContainer(req);
@@ -46,6 +46,9 @@ public class ContainerServlet extends HttpServlet {
             }
             else if ("getAllContainers".equals(status)) {
                 path = this.getAllContainers(req);
+            }
+            else if("removeContainer".equals(status)) {
+                path = this.removeContainer(req);
             }
         }
         req.getRequestDispatcher(path).forward(req,resp);
@@ -60,13 +63,20 @@ public class ContainerServlet extends HttpServlet {
 
         String msg = ""; //表示提示信息
         String url = ""; // 表示跳转路径
+        boolean msgStatus = true;
+        boolean alertFlag = true;
 
         //获取创建容器的类型
         String containerImage = req.getParameter("image");
+        //获取容器名
+        String name = req.getParameter("name");//暂时不处理
+        //获取docker服务器ip地址
+        String machineIp = req.getParameter("machine");
         //获取json文件路径
         String path = this.getClass().getResource("/container/json/" + containerImage + ".json").getPath();
+        String machineUrl ="http://"+machineIp+"/containers/create";
         //docker服务器响应结果
-        JSONObject response = HttpClientUtil.doPost("http://192.168.43.230:2375/containers/create", FileUtil.readJsonFile(path));
+        JSONObject response = HttpClientUtil.doPost(machineUrl, FileUtil.readJsonFile(path));
 
         //容器创建成功
         if (response != null) {
@@ -80,13 +90,14 @@ public class ContainerServlet extends HttpServlet {
             container.setCreateAdminId(1);//默认管理员id为1
             container.setImage(containerImage);//设置容器镜像
             container.setStatus(0);
+            container.setMachineIp(machineIp);
             try {   //调用工厂类方法，完成插入数据操作
                 if (ServiceFactory.ContainerServiceInstance().createContainer(container)) {
                     msg = "创建容器成功！容器Id为：" + containerId;
-                    url = "/pages/back/index.jsp";
+                    msgStatus = true;
                 } else {
                     msg = "容器信息数据库记录出错了:(";
-                    url = "/pages/back/index.jsp";
+                    msgStatus = false;
                 }
 
             } catch (Exception e) {
@@ -95,13 +106,23 @@ public class ContainerServlet extends HttpServlet {
         }
         else {
             msg = "容器创建失败了:(";
-            url = "/pages/back/index.jsp";
+            msgStatus = false;
         }
 
         req.setAttribute("msg",msg);
-        req.setAttribute("url",url);
-        System.out.println(msg);
-        return "";
+        req.setAttribute("msgStatus",msgStatus);
+        req.setAttribute("alertFlag",alertFlag);
+
+        if(msgStatus)
+        {
+            return "/container/getAllContainers";
+        }
+
+        else
+        {
+            return "/pages/container/container_create.jsp";
+        }
+
     }
 
     /**
@@ -271,6 +292,7 @@ public class ContainerServlet extends HttpServlet {
     public String getAllContainers(HttpServletRequest req) {
 
         //初始化
+        boolean alertFlag = true;
         boolean msgStatus = true;//表示执行状态
         String msg = ""; //表示提示信息
         Integer currentPage = Integer.valueOf(1);
@@ -322,12 +344,68 @@ public class ContainerServlet extends HttpServlet {
 
         //定义跳转网页url
         if (msgStatus == true)
+        {
             return "/pages/container/container_list.jsp";
+        }
         else
+        {
+            req.setAttribute("alertFlag",alertFlag);
             return "/pages/index.jsp";
+        }
     }
+
+    //重启容器
     public String restartContainer(HttpServletRequest req) {
         return "";
     }
+
+    //删除容器
+    public String removeContainer(HttpServletRequest req) {
+
+        //提示信息
+        String msg = "";
+        boolean alertFlag = false;
+
+        //获取请求containerId和ip
+        String containerId = req.getParameter("containerId");
+        String machineIp = req.getParameter("machineIp");
+
+        //与docker服务器通信，删除容器
+        String removeUrl = "Http://"+machineIp+"/containers/"+containerId;
+        JSONObject res = HttpClientUtil.doDelete(removeUrl);//通信结果
+        if (res == null) {
+            alertFlag = true;
+            msg = "删除容器时与docker服务器通信异常。";
+            System.out.println(msg);
+            req.setAttribute("msg",msg);
+            req.setAttribute("alertFlag",alertFlag);
+            return "/pages/index.jsp";
+        }
+
+        //更改数据库status
+        boolean sqlResult = true;
+        int status = 6;
+        try {
+            sqlResult = ServiceFactory.ContainerServiceInstance().updateContainerStatus(status,containerId);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (sqlResult == false) {
+            alertFlag = true;
+            msg = "删除容器时更改数据库记录失败。";
+            System.out.println(msg);
+            req.setAttribute("msg",msg);
+            req.setAttribute("alertFlag",alertFlag);
+            return "/pages/index.jsp";
+        }
+
+        return "/container/getAllContainers";
+    }
+
+    //暂停容器
+
+    //取消暂停容器
+
+    //同docker服务器更新某一容器
 
 }

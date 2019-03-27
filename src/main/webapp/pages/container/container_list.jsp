@@ -59,7 +59,7 @@
                                 <td>${container.createAdminId}</td>
                                 <td>${container.createTime}</td>
                                 <td>22</td>
-                                <td>127.0.0.1</td>
+                                <td>${container.machineIp}</td>
                                 <td><div class="btn-group">
                                     <button type="button" class="btn btn-default dropdown-toggle btn-sm"
                                             data-toggle="dropdown">
@@ -87,7 +87,7 @@
                                             </li>
                                         </c:if>
                                             <li>
-                                                <a href="#">删除</a>
+                                                <a href="/container/removeContainer?containerId=${container.containerId}&machineIp=${container.machineIp}">删除</a>
                                             </li>
                                     </ul>
                                 </div></td>
@@ -112,8 +112,11 @@
 <script src="assets/js/jquery.metisMenu.js"></script>
 <script src="assets/js/custom.js"></script>
 <script type="text/javascript">
+    <%--window.onload = function(){--%>
+        <%--if("${alertFlag}" == "true")--%>
+                <%--alert("${msg}");--%>
+    <%--};--%>
     function updateContainers(){
-        //alert("1");
         $.ajax({
             url:"${basePath}"+"container/updateContainers",
             type:"GET",

@@ -92,4 +92,14 @@ public class ContainerServiceImpl implements IContainerService {
             return null;
         }
     }
+
+    @Override
+    public boolean updateContainerStatus(int status, String containerId) throws Exception {
+        try {
+            return ContainerFactory.ContainerInstance().updateContainerStatus(status,containerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

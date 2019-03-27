@@ -38,11 +38,11 @@ public class ContainerDaoImpl implements IContainerDao {
         //完成插入操作
         QueryRunner qr = new QueryRunner();
         int result = 0;
-        String sql = "INSERT INTO container(container_id,create_admin_id,create_time,status,image) " +
+        String sql = "INSERT INTO container(container_id,create_admin_id,create_time,status,image,machine_ip) " +
                 "VALUES (?,?,?,?,?)";//定义sql插入语句
         try {
             result = qr.update(conn,sql,vo.getContainerId(),vo.getCreateAdminId(),
-                    vo.getCreateTime(),vo.getStatus(),vo.getImage());
+                    vo.getCreateTime(),vo.getStatus(),vo.getImage(),vo.getMachineIp());
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -195,11 +195,12 @@ public class ContainerDaoImpl implements IContainerDao {
         //查询所有status!=6的容器
         List<Object[]> result = new ArrayList<>();
         QueryRunner qr = new QueryRunner();
-        String sql = "SELECT * FROM container WHERE " + clown + " LIKE ? AND status <> 6 LIMIT ?,?";
+        String sql = "SELECT id,container_id,create_admin_id,create_time,status,image,machine_ip" +
+                " FROM container WHERE " + clown + " LIKE ? AND status <> 6 LIMIT ?,?";
         Object[] params = new Object[3];
         params[0]="%" + keyWord + "%";
         params[1]=(currentPage.intValue() - 1) * lineSize.intValue();
-        params[2] = currentPage.intValue() * lineSize.intValue();
+        params[2] = lineSize.intValue();//currentPage.intValue() *
         try {result=qr.query(conn,sql,new ArrayListHandler(),params);
         } catch (SQLException e) {
             System.out.println("分页获取container表所有信息异常。");
@@ -223,9 +224,34 @@ public class ContainerDaoImpl implements IContainerDao {
             temp.setCreateTime((Timestamp)container[3]);
             temp.setStatus((Integer)container[4]);
             temp.setImage((String)container[5]);
+            temp.setMachineIp((String)container[6]);
             containerResult.add(temp);
         }
 
         return containerResult;
+    }
+
+    @Override
+    public boolean updateContainerStatus(int status, String containerId) throws SQLException {
+
+        //更新字段
+        QueryRunner qr = new QueryRunner();
+        int result = 0;
+        String sql = "UPDATE container SET status = ? " +
+                " WHERE container_id = ?";
+        Object[] params = {status,containerId};
+        try {
+            result = qr.update(conn,sql,params);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DbUtils.close(conn);
+        }
+
+        //检查结果
+        if (result != 0) {
+            return true;
+        }
+        return false;
     }
 }
