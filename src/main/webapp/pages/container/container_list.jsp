@@ -81,9 +81,9 @@
                                                 <a href="#">取消暂停</a>
                                             </li>
                                         </c:if>
-                                        <c:if test="${container.status==0 ||container.status==2 }">
+                                        <c:if test="${container.status!=6 }">
                                             <li>
-                                                <a href="#">重启</a>
+                                                <a href="/container/restartContainer?containerId=${container.containerId}&machineIp=${container.machineIp}">重启</a>
                                             </li>
                                         </c:if>
                                             <li>

@@ -1,6 +1,7 @@
 package servlet;
 
 import factory.ServiceFactory;
+import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import utils.FileUtil;
 import utils.GeneralUtil;
@@ -51,6 +52,9 @@ public class ContainerServlet extends HttpServlet {
             }
             else if("removeContainer".equals(status)) {
                 path = this.removeContainer(req);
+            }
+            else if("restartContainer".equals(status)) {
+                path = this.restartContainer(req);
             }
         }
         req.getRequestDispatcher(path).forward(req,resp);
@@ -388,7 +392,78 @@ public class ContainerServlet extends HttpServlet {
 
     //重启容器
     public String restartContainer(HttpServletRequest req) {
-        return "";
+
+        //初始化
+        String msg = ""; //表示提示信息
+        String url = "/container/getAllContainers"; // 跳转路径
+        boolean msgStatus = true;
+        req.setAttribute("url",url);
+        String containerId = req.getParameter("containerId");
+        String machineIp = req.getParameter("machineIp");
+
+        //获取数据库中该容器status
+        Container result = null;
+        try {
+            result = ServiceFactory.ContainerServiceInstance().queryContainerByContainerId(containerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            msg = "数据库查询容器信息异常。";
+            msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
+        }
+        if (result == null) {
+            msg = "数据库中未查询到该容器信息。";
+            msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
+        }
+
+        //status符合要求的情况下 与docker 服务器通信重启容器
+        if ( result.getStatus() == 6)
+        {
+            msg = "sorry,容器状态不允许重启。";
+            msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
+        }
+        String restartUrl = "http://"+machineIp+"/containers/"+containerId+"/restart";
+        JSONObject restartRes = HttpClientUtil.doPost(restartUrl);
+        if (restartRes == null) {
+            msg = "重启服务器时与Docker服务器通信失败。";
+            msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
+        }
+
+        //更改数据库相关记录
+        try {
+            if(ServiceFactory.ContainerServiceInstance().updateContainerStatus(1,containerId))
+            {
+                msg = "重启服务器成功。";
+                msgStatus = true;
+                req.setAttribute("msg",msg);
+                req.setAttribute("msgStatus",msgStatus);
+                return forwardJspUrl;
+            }
+            else {
+                msg = "重启服务器时更改数据库记录失败。";
+                msgStatus = false;
+                req.setAttribute("msg",msg);
+                req.setAttribute("msgStatus",msgStatus);
+                return forwardJspUrl;
+            }
+        } catch (Exception e) {
+            msg = "重启服务器时更改数据库记录出现异常。";
+            msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
+        }
     }
 
     //删除容器
@@ -396,7 +471,6 @@ public class ContainerServlet extends HttpServlet {
 
         //提示信息
         String msg = "";
-        boolean alertFlag = false;
         String url = "/container/getAllContainers";
         req.setAttribute("url",url);
         boolean msgStatus = true;
@@ -442,7 +516,5 @@ public class ContainerServlet extends HttpServlet {
     //暂停容器
 
     //取消暂停容器
-
-    //同docker服务器更新某一容器
 
 }
