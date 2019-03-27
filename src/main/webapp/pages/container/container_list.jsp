@@ -30,9 +30,9 @@
         <div id="page-inner">
             <div style="padding: 10px 10px 20px 10px">
                 <h1 style="display:inline" class="h1 col-md-offset-1">容器列表</h1>
-                <button type="button" class="btn btn-warning col-md-offset-8"  id="updateInfo" onclick="updateContainers()">
-                    刷新容器信息
-                </button>
+                <%--<button type="button" class="btn btn-warning col-md-offset-8"  id="updateInfo" onclick="updateContainers()">--%>
+                    <%--刷新容器信息--%>
+                <%--</button>--%>
             </div>
             <div class="panel panel-default">
                 <div class="panel-body">

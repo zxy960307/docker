@@ -45,7 +45,7 @@ public class ContainerServlet extends HttpServlet {
                 return;
             }
             else if ("getAllContainers".equals(status)) {
-                path = this.getAllContainers(req);
+                path = this.getAllContainers(req,resp);
             }
             else if("removeContainer".equals(status)) {
                 path = this.removeContainer(req);
@@ -220,7 +220,7 @@ public class ContainerServlet extends HttpServlet {
         resp.setContentType("text/html");
         resp.setCharacterEncoding("utf-8");
 
-        //获取数据库中所有已注册容器的container_id
+        //获取数据库中所有已注册容器的container_id && status != 6
         Container[] containers;//存放查询结果
         List<Container> containersList = new ArrayList<>();
         try {
@@ -251,7 +251,6 @@ public class ContainerServlet extends HttpServlet {
             JSONObject state =  (JSONObject) res[i].get("State");
             String status = (String)state.get("Status");
             containers[i].setStatus(Integer.parseInt(PropertyUtil.getProperty(status)));
-            System.out.println(status);//exited:2 created :0
         }
 
         //修改数据库中内容
@@ -270,18 +269,26 @@ public class ContainerServlet extends HttpServlet {
             }
         }
 
-        String jsonStr = "{\"msg\":\""+msg+"\"}";
-        msg = "同Docker服务器更新数据成功";
-        JSONObject msgJson = new JSONObject();
-
         try {
             resp.getWriter().write(msg);
-            System.out.println("resp成功");
         }catch (Exception e)
         {
             e.printStackTrace();
-            System.out.println("resp失败");
         }
+
+        req.setAttribute("msg",msg);
+        req.setAttribute("msgStatus",msgStatus);
+        if (msgStatus == false) {
+            return;
+        }
+        else {
+            msg = "同Docker服务器更新数据成功";
+            return;
+        }
+        //String jsonStr = "{\"msg\":\""+msg+"\"}";
+        //JSONObject msgJson = new JSONObject();
+
+
     }
 
     /**
@@ -289,7 +296,15 @@ public class ContainerServlet extends HttpServlet {
      * @param req
      * @return
      */
-    public String getAllContainers(HttpServletRequest req) {
+    public String getAllContainers(HttpServletRequest req,HttpServletResponse resp) {
+
+        //调用updateContainers函数，更新所有数据
+        this.updateContainers(req,resp);
+        if((boolean)req.getAttribute("msgStatus") == false)
+        {
+            req.setAttribute("alertFlag",true);
+            return "/pages/index.jsp";
+        }
 
         //初始化
         boolean alertFlag = true;

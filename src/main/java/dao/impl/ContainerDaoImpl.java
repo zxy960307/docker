@@ -39,7 +39,7 @@ public class ContainerDaoImpl implements IContainerDao {
         QueryRunner qr = new QueryRunner();
         int result = 0;
         String sql = "INSERT INTO container(container_id,create_admin_id,create_time,status,image,machine_ip) " +
-                "VALUES (?,?,?,?,?)";//定义sql插入语句
+                "VALUES (?,?,?,?,?,?)";//定义sql插入语句
         try {
             result = qr.update(conn,sql,vo.getContainerId(),vo.getCreateAdminId(),
                     vo.getCreateTime(),vo.getStatus(),vo.getImage(),vo.getMachineIp());
@@ -63,9 +63,9 @@ public class ContainerDaoImpl implements IContainerDao {
         QueryRunner qr = new QueryRunner();
         int result = 0;
         String sql = "UPDATE container SET container_id=?,create_admin_id=?," +
-                "create_time=?,image=?,status = ? WHERE id = ?";
+                "create_time=?,image=?,status = ? ,machine_ip = ? WHERE id = ?";
         Object[] params = {vo.getContainerId(),vo.getCreateAdminId(),vo.getCreateTime(),
-                            vo.getImage(),vo.getStatus(),vo.getId()};
+                            vo.getImage(),vo.getStatus(),vo.getMachineIp(),vo.getId()};
         try {
             result = qr.update(conn,sql,params);
         } catch (SQLException e) {
@@ -100,7 +100,8 @@ public class ContainerDaoImpl implements IContainerDao {
 
         //获得表中所有信息
         QueryRunner qr = new QueryRunner();
-        String sql = "SELECT * FROM container";
+        String sql = "SELECT id,container_id,create_admin_id,create_time,status,image,machine_ip FROM container " +
+                "WHERE status <> 6";
         try {result=qr.query(conn,sql,new ArrayListHandler());
         } catch (SQLException e) {
             System.out.println("获取container表所有信息异常。");
@@ -123,10 +124,10 @@ public class ContainerDaoImpl implements IContainerDao {
             temp.setCreateTime((Timestamp)container[3]);
             temp.setStatus((Integer)container[4]);
             temp.setImage((String)container[5]);
+            temp.setMachineIp((String)container[6]);
             containerResult.add(temp);
         }
 
-        System.out.println(containerResult);
         return containerResult;
     }
 
