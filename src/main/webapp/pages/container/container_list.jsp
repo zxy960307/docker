@@ -68,7 +68,7 @@
                                     <ul class="dropdown-menu" role="menu">
                                         <c:if test="${container.status==0 ||container.status==2 }">
                                             <li>
-                                                <a href="#">启动</a>
+                                                <a href="/container/startContainer?containerId=${container.containerId}&machineIp=${container.machineIp}">启动</a>
                                             </li>
                                         </c:if>
                                         <c:if test="${container.status==1 }">

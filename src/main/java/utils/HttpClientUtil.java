@@ -83,10 +83,12 @@ public class HttpClientUtil {
                 try {
                     String result = EntityUtils.toString(res.getEntity());// 返回json格式：
                     response = JSONObject.fromObject(result);//解析响应实体
+                    response.put("result",true);
                 } catch (Exception e) {
                     System.out.println("数据发送正常，响应数据异常");
                     response = new JSONObject();
                     response.put("msg","数据发送正常，响应数据异常");
+                    response.put("result",false);
                     return response;
                 }
             }

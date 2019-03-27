@@ -22,6 +22,8 @@ import java.util.List;
  */
 public class ContainerServlet extends HttpServlet {
 
+    String forwardJspUrl = "/pages/forward.jsp";
+
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         this.doPost(req, resp);
@@ -38,7 +40,7 @@ public class ContainerServlet extends HttpServlet {
                  path = this.createContainer(req);
             }
             else if ("startContainer".equals(status)) {
-                this.startContainer(req);
+                path = this.startContainer(req);
             }
             else if ("updateContainers".equals(status)) {
                 this.updateContainers(req,resp);
@@ -64,7 +66,6 @@ public class ContainerServlet extends HttpServlet {
         String msg = ""; //表示提示信息
         String url = ""; // 表示跳转路径
         boolean msgStatus = true;
-        boolean alertFlag = true;
 
         //获取创建容器的类型
         String containerImage = req.getParameter("image");
@@ -111,18 +112,11 @@ public class ContainerServlet extends HttpServlet {
 
         req.setAttribute("msg",msg);
         req.setAttribute("msgStatus",msgStatus);
-        req.setAttribute("alertFlag",alertFlag);
+        url = "/pages/container/container_create.jsp";
+        req.setAttribute("url",url);
 
-        if(msgStatus)
-        {
-            return "/container/getAllContainers";
-        }
 
-        else
-        {
-            return "/pages/container/container_create.jsp";
-        }
-
+        return forwardJspUrl;
     }
 
     /**
@@ -133,7 +127,10 @@ public class ContainerServlet extends HttpServlet {
     public String startContainer(HttpServletRequest req) {
 
         String msg = ""; //表示提示信息
-        String url = ""; // 表示跳转路径
+        String url = "/container/getAllContainers"; // 表示跳转路径
+        boolean msgStatus = true;
+        boolean alertFlag = false;
+        req.setAttribute("url",url);
 
         //获取请求参数并检查数据
         String containerId = req.getParameter("containerId");
@@ -141,8 +138,10 @@ public class ContainerServlet extends HttpServlet {
         if (GeneralUtil.isStrEmpty(containerId)||
                 GeneralUtil.isStrEmpty(machineIp)) {
             msg = "容器id不能为空";
-            url = "";
-            return "";
+            msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
         }
 
         //获取容器状态status
@@ -154,45 +153,61 @@ public class ContainerServlet extends HttpServlet {
             status = result.getStatus();
             if (result == null ) {
                 msg = "容器信息未查询到。";
-                url = "";
-                return "";
+                msgStatus = false;
+                req.setAttribute("msg",msg);
+                req.setAttribute("msgStatus",msgStatus);
+                return forwardJspUrl;
             }
         } catch (Exception e) {
             e.printStackTrace();
             msg = "容器信息查询异常。";
-            url = "";
-            return "";
+            msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
         }
 
         //判断容器是否为create状态，并启动容器
-        if (status == 0) {
+        if (status == 0 ||status == 2) {
             //发送start容器的Post请求
             String machineUrl = "http://"+machineIp+":2375/containers/"+containerId+"/start";
             JSONObject response = HttpClientUtil.doPost(machineUrl);
             if (response == null) {
                 msg = "与Docker服务通信异常，启动容器失败!";
-                url = "";
-                return "";
+                msgStatus = false;
+                req.setAttribute("msg",msg);
+                req.setAttribute("msgStatus",msgStatus);
+                return forwardJspUrl;
             }
             else {
                 //改变数据库中该容器status信息
                 result.setStatus(1);//修改status为1，表示正在运行
                 boolean updateStatusResult = false;
                 try {
-                    updateStatusResult = ServiceFactory.ContainerServiceInstance().
-                            updateContainer(result);
+                    updateStatusResult = ServiceFactory.ContainerServiceInstance().updateContainerStatus(1,containerId);
                 } catch (Exception e) {
                     msg = "数据库更新容器状态信息异常。";
-                    url = "";
-                    return "";
+                    msgStatus = false;
+                    req.setAttribute("msg",msg);
+                    req.setAttribute("msgStatus",msgStatus);
+                    return forwardJspUrl;
                 }
                 //判断是否更新成功
                 if (updateStatusResult) {
-                    msg = "容器状态更新成功。";
-                    url = "";
-                    return "";
+                    msg = "容器启动成功。";
+                    msgStatus = true;
+                    url = "/container/getAllContainers";
+                    req.setAttribute("msg",msg);
+                    req.setAttribute("msgStatus",msgStatus);
+                    return forwardJspUrl;
                 }
-
+                else {
+                    msg = "数据库更新容器状态失败。";
+                    msgStatus = false;
+                    req.setAttribute("msg",msg);
+                    req.setAttribute("msgStatus",msgStatus);
+                    return forwardJspUrl;
+                }
             }
 
         }
@@ -200,9 +215,11 @@ public class ContainerServlet extends HttpServlet {
         else {
             msg = "容器处于xx状态，不能启动。";
             url = "";
-            return "";
+            alertFlag = true;
+            req.setAttribute("msg",msg);
+            req.setAttribute("alertFlag",alertFlag);
+            return "/pages/index.jsp";
         }
-        return "";
     }
 
     /**
@@ -298,20 +315,21 @@ public class ContainerServlet extends HttpServlet {
      */
     public String getAllContainers(HttpServletRequest req,HttpServletResponse resp) {
 
-        //调用updateContainers函数，更新所有数据
-        this.updateContainers(req,resp);
-        if((boolean)req.getAttribute("msgStatus") == false)
-        {
-            req.setAttribute("alertFlag",true);
-            return "/pages/index.jsp";
-        }
-
         //初始化
         boolean alertFlag = true;
         boolean msgStatus = true;//表示执行状态
         String msg = ""; //表示提示信息
+        String url = "/pages/index.jsp";
         Integer currentPage = Integer.valueOf(1);
         Integer lineSize = Integer.valueOf(4);
+        req.setAttribute("url",url);
+
+        //调用updateContainers函数，更新所有数据
+        this.updateContainers(req,resp);
+        if((boolean)req.getAttribute("msgStatus") == false)
+        {
+            return forwardJspUrl;
+        }
 
         try {
            currentPage = Integer.valueOf(Integer.parseInt(req.getParameter("cp"))); } catch (Exception localException1) {
@@ -342,31 +360,30 @@ public class ContainerServlet extends HttpServlet {
             e.printStackTrace();
             msg = "获取容器信息列表异常。";
             msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
         }
         //检查结果
         if (containers.size()<=0) {
             msg = "获取容器信息列表为空。";
             msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
         }
 
         //封装结果
-        req.setAttribute("url", "/container/getAllContainers");
+        req.setAttribute("url","/container/getAllContainers");//复写url信息
+        msg = "获取分页信息成功";
         req.setAttribute("currentPage", currentPage);
         req.setAttribute("lineSize", lineSize);
         req.setAttribute("allContainers",containers);
         req.setAttribute("allRecorders",allRecorders);
         req.setAttribute("msg",msg);
+        req.setAttribute("msgStatus",msgStatus);
 
-        //定义跳转网页url
-        if (msgStatus == true)
-        {
-            return "/pages/container/container_list.jsp";
-        }
-        else
-        {
-            req.setAttribute("alertFlag",alertFlag);
-            return "/pages/index.jsp";
-        }
+        return "/pages/container/container_list.jsp";
     }
 
     //重启容器
@@ -380,21 +397,23 @@ public class ContainerServlet extends HttpServlet {
         //提示信息
         String msg = "";
         boolean alertFlag = false;
+        String url = "/container/getAllContainers";
+        req.setAttribute("url",url);
+        boolean msgStatus = true;
 
         //获取请求containerId和ip
         String containerId = req.getParameter("containerId");
         String machineIp = req.getParameter("machineIp");
 
         //与docker服务器通信，删除容器
-        String removeUrl = "Http://"+machineIp+"/containers/"+containerId;
+        String removeUrl = "Http://"+machineIp+"/containers/"+containerId+"?force=1";
         JSONObject res = HttpClientUtil.doDelete(removeUrl);//通信结果
         if (res == null) {
-            alertFlag = true;
+            msgStatus = false;
             msg = "删除容器时与docker服务器通信异常。";
-            System.out.println(msg);
             req.setAttribute("msg",msg);
-            req.setAttribute("alertFlag",alertFlag);
-            return "/pages/index.jsp";
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
         }
 
         //更改数据库status
@@ -406,15 +425,18 @@ public class ContainerServlet extends HttpServlet {
             e.printStackTrace();
         }
         if (sqlResult == false) {
-            alertFlag = true;
+            msgStatus = false;
             msg = "删除容器时更改数据库记录失败。";
-            System.out.println(msg);
             req.setAttribute("msg",msg);
-            req.setAttribute("alertFlag",alertFlag);
-            return "/pages/index.jsp";
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
         }
 
-        return "/container/getAllContainers";
+        msgStatus = true;
+        msg = "删除容器成功。";
+        req.setAttribute("msg",msg);
+        req.setAttribute("msgStatus",msgStatus);
+        return forwardJspUrl;
     }
 
     //暂停容器
