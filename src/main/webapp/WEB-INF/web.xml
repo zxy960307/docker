@@ -21,4 +21,12 @@
     <url-pattern>/container/*</url-pattern>
   </servlet-mapping>
   <!--配置jstl-->
+  <servlet>
+    <servlet-name>image</servlet-name>
+    <servlet-class>servlet.ImageServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>image</servlet-name>
+    <url-pattern>/image/*</url-pattern>
+  </servlet-mapping>
 </web-app>
