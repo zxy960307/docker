@@ -1,6 +1,7 @@
 package utils;
 
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -168,6 +169,45 @@ public class HttpClientUtil {
                 return null;
             }
         } catch (Exception e) {
+            System.out.println("与docker服务器http连接异常,数据未发送!");
+            return null;
+        }
+
+        return response;
+    }
+
+    /**
+     *  get请求返回jsonarray
+     * @param url
+     * @return
+     */
+    public static JSONArray doGetArray(String url) {
+
+        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+        CloseableHttpResponse res = null;
+        HttpGet get = new HttpGet(url);
+        JSONArray response = null;
+
+        try {
+            res = httpclient.execute(get);
+            //消息码正常时
+            if(res.getStatusLine().getStatusCode() == 200) {
+                try {
+                    String result = EntityUtils.toString(res.getEntity());// 返回json格式：
+                    response = JSONArray.fromObject(result);//解析响应实体
+                } catch (Exception e) {
+                    System.out.println("数据发送正常，响应数据异常");
+                    response = new JSONArray();
+                    return response;
+                }
+            }
+            else
+            {
+                System.out.println("与docker服务器http连接异常!");
+                return null;
+            }
+        }
+        catch (IOException e) {
             System.out.println("与docker服务器http连接异常,数据未发送!");
             return null;
         }

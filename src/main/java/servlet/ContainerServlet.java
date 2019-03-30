@@ -320,7 +320,6 @@ public class ContainerServlet extends HttpServlet {
     public String getAllContainers(HttpServletRequest req,HttpServletResponse resp) {
 
         //初始化
-        boolean alertFlag = true;
         boolean msgStatus = true;//表示执行状态
         String msg = ""; //表示提示信息
         String url = "/pages/index.jsp";
