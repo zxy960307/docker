@@ -124,4 +124,39 @@ public class ImageDaoImpl  implements IImageDao {
 
         return imageResults;
     }
+
+    @Override
+    public List<Image> getMachineImages(String machineIp) throws SQLException {
+
+        //查询所有镜像image
+        List<Object[]> result = new ArrayList<>();
+        QueryRunner qr = new QueryRunner();
+        String sql = "SELECT id,image_id,repo_tags,machine_ip " +
+                " FROM image WHERE machine_ip = '" + machineIp+"'";
+        try {result=qr.query(conn,sql,new ArrayListHandler());
+        } catch (SQLException e) {
+            System.out.println("获取machine相关image表信息异常。");
+            e.printStackTrace();
+        } finally {
+            DbUtils.close(conn);
+        }
+
+        //封装结果
+        //判断结果是否为空
+        if (result.size() <= 0) {
+            System.out.println("获取image表所有信息为空。");
+            return new ArrayList<Image>();
+        }
+        List<Image> imageResults = new ArrayList<>();//存放封装后的结果
+        for(Object[] image:result) {
+            Image temp = new Image();
+            temp.setId(Integer.parseInt(String.valueOf(image[0])));
+            temp.setImageId((String) image[1]);
+            temp.setRepoTags((String) image[2]);
+            temp.setMachineIp((String) image[3]);
+            imageResults.add(temp);
+        }
+
+        return imageResults;
+    }
 }

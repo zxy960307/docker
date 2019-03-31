@@ -1,5 +1,6 @@
 package servlet;
 
+import factory.MachineFactory;
 import factory.ServiceFactory;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
@@ -8,6 +9,7 @@ import utils.GeneralUtil;
 import utils.HttpClientUtil;
 import utils.PropertyUtil;
 import vo.Container;
+import vo.Machine;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -55,6 +57,9 @@ public class ContainerServlet extends HttpServlet {
             }
             else if("restartContainer".equals(status)) {
                 path = this.restartContainer(req);
+            }
+            else if("createPro".equals(status)) {
+                path = this.createPro(req);
             }
         }
         req.getRequestDispatcher(path).forward(req,resp);
@@ -515,5 +520,44 @@ public class ContainerServlet extends HttpServlet {
     //暂停容器
 
     //取消暂停容器
+
+    /**
+     * 创建容器之前获取机器信息
+     * @param req
+     * @return
+     */
+    public String createPro(HttpServletRequest req) {
+
+        //提示信息
+        String msg = "";
+        String url = "/pages/index.jsp";
+        req.setAttribute("url",url);
+        boolean msgStatus = true;
+
+        //从数据库中取出所有机器信息
+        List<Machine> allMachines = null;
+        try {
+            allMachines = MachineFactory.MachineInstance().findAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+            msgStatus = false;
+            msg = "获取机器所有机器信息异常。";
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
+        }
+        //判断获取结果是否为空
+        if (allMachines == null || allMachines.size() == 0) {
+            msgStatus = false;
+            msg = "获取机器所有机器信息为空。";
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
+        }
+
+        //返回结果
+        req.setAttribute("allMachines",allMachines);
+        return "/pages/container/container_create.jsp";
+    }
 
 }

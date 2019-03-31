@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="my" uri="/WEB-INF/returnstatusstr.tld"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page isELIgnored="false" %>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -37,27 +38,21 @@
                             <input type="text" class="form-control " placeholder="twitterhandle" name="name">
                         </div>
                         <br>
+                            <div class="input-group col-lg-8 col-md-offset-2">
+                                <%--<label for="imageSelect">选择列表</label>--%>
+                                <span class="input-group-addon">machine</span>
+                                <select class="form-control" id="machineSelect" name="machine" onchange="getImages()">
+                                    <option value="">请选择机器</option>
+                                        <c:forEach items="${allMachines}" var="machine">
+                                            <option value="${machine.ip}">${machine.name}:${machine.ip}</option>
+                                        </c:forEach>
+                                </select>
+                            </div>
+                            </br>
                         <div class="input-group col-lg-8 col-md-offset-2">
-                            <%--<label for="imageSelect">选择列表</label>--%>
                             <span class="input-group-addon">image</span>
                             <select class="form-control" id="imageSelect" name="image">
-                                <option value="mysql" selected="selected">mysql</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                                <option>5</option>
-                            </select>
-                        </div>
-                        <br>
-                        <div class="input-group col-lg-8 col-md-offset-2">
-                            <%--<label for="imageSelect">选择列表</label>--%>
-                            <span class="input-group-addon">machine</span>
-                            <select class="form-control" id="machineSelect" name="machine">
-                                <option value="192.168.43.230:2375" selected="selected">pc2:192.168.43.230</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                                <option>5</option>
+                                <option value="" >选择镜像</option>
                             </select>
                         </div>
                             </br>
@@ -88,9 +83,27 @@
     //            title:'创建容器',
     //        });
     //    })
-    window.onload= function(){
-        if ("${alertFlag}" == "true")
-                alert("${msg}");
+    function getImages() {
+        var machineIp = $("#machineSelect").val();
+        $.ajax({
+            url:"${basePath}"+"image/getMachineImages",
+            type:"GET",
+            contentType:'application/json;charset=UTF-8',
+            data:{"machineIp":machineIp},
+            dataType:"json",
+            success:function(data){
+                console.log(data.length);
+                var html = "";
+                for (var i =0;i<data.length;i++) {
+                    html+="<option value="+data[i].repoTags+">"+data[i].repoTags+"</option>";
+                }
+                $("#imageSelect").append(html);
+            },
+            error:function(data){
+                alert("获取machine相关镜像失败");
+                window.location.href="${bastPath}"+"pages/index.jsp";
+            }
+        });
     }
 </script>
 </body>

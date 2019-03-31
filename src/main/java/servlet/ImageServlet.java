@@ -38,6 +38,10 @@ public class ImageServlet extends HttpServlet {
             if("getAllImagesSplit".equals(status)) {
                 path = this.getAllImagesSplit(req,resp);
             }
+            else if("getMachineImages".equals(status)) {
+                this.getMachineImages(req,resp);
+                return;
+            }
         }
         req.getRequestDispatcher(path).forward(req,resp);
     }
@@ -195,6 +199,61 @@ public class ImageServlet extends HttpServlet {
         msg = "同docker服务器更新镜像信息成功。";
         req.setAttribute("msg",msg);
         req.setAttribute("msgStatus",msgStatus);
+        return;
+    }
+
+    public void getMachineImages(HttpServletRequest req,HttpServletResponse resp) {
+        resp.setContentType("text/json");
+        resp.setCharacterEncoding("utf-8");
+
+        boolean msgStatus = true;//表示执行状态
+        String msg = ""; //表示提示信息
+        String url = "/pages/index.jsp";
+        Integer currentPage = Integer.valueOf(1);
+        Integer lineSize = Integer.valueOf(4);
+        req.setAttribute("url",url);
+
+        //获取请求参数
+        String machineIp = (String)req.getParameter("machineIp");
+
+        //与docker服务器同步镜像信息
+        this.updateImages(req);
+        //同步失败
+        if (req.getAttribute("msgStatus") == false){
+            try {
+                resp.getWriter().write((String)req.getAttribute("msg"));
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        //从数据库获取镜像信息
+        List<Image> images = null;
+        try {
+            images = ServiceFactory.ImageServiceInstance().getMachineImages(machineIp);
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                resp.getWriter().write("获取machine相关镜像信息异常");
+                return;
+            } catch (Exception E) {
+            }
+            return;
+        }
+        if (images == null || images.size() <= 0) {
+            try {
+                resp.getWriter().write("获取machine相关镜像信息为空");
+                return;
+            } catch (Exception e) {
+            }
+        }
+
+        //封装信息为jsonArray
+        JSONArray imagesJson = JSONArray.fromObject(images);
+        try {
+            resp.getWriter().print(imagesJson);
+        } catch (Exception e) {}
         return;
     }
 }

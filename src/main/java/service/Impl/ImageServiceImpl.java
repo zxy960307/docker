@@ -6,6 +6,7 @@ import service.IImageService;
 import vo.Image;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,5 +35,15 @@ public class ImageServiceImpl implements IImageService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public List<Image> getMachineImages(String machineIp) throws Exception {
+        try {
+            return ImageFactory.ImageInstance().getMachineImages(machineIp);
+        } catch ( Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

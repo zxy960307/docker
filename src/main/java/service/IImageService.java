@@ -2,6 +2,7 @@ package service;
 
 import vo.Image;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,4 +13,7 @@ public interface IImageService {
 
     public Map<String,Object> getAllImagesPag(String paramString1, String paramString2,
                                                   Integer paramInteger1, Integer paramInteger2) throws Exception;
+
+    public List<Image> getMachineImages(String machineIp) throws Exception;
+
 }
