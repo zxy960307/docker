@@ -20,6 +20,8 @@ public class Test {
         System.out.println(res);
     }
     public static void main(String [] args) {
-        new Test().testJson();
+
+        boolean pingFlag = HttpClientUtil.ping("192.168.43.23");
+        System.out.print(pingFlag);
     }
 }

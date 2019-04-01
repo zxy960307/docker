@@ -29,4 +29,12 @@
     <servlet-name>image</servlet-name>
     <url-pattern>/image/*</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>machine</servlet-name>
+    <servlet-class>servlet.MachineServlet</servlet-class>
+    </servlet>
+  <servlet-mapping>
+    <servlet-name>machine</servlet-name>
+    <url-pattern>/machine/*</url-pattern>
+  </servlet-mapping>
 </web-app>

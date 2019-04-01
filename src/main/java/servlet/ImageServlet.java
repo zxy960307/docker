@@ -219,7 +219,7 @@ public class ImageServlet extends HttpServlet {
         //与docker服务器同步镜像信息
         this.updateImages(req);
         //同步失败
-        if (req.getAttribute("msgStatus") == false){
+        if ((boolean)req.getAttribute("msgStatus") == false){
             try {
                 resp.getWriter().write((String)req.getAttribute("msg"));
                 return;

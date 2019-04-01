@@ -12,6 +12,15 @@ public class Machine {
     private String ip;
     private int status;
     private Timestamp createTime;
+    private boolean pingFlag;
+
+    public boolean isPingFlag() {
+        return pingFlag;
+    }
+
+    public void setPingFlag(boolean pingFlag) {
+        this.pingFlag = pingFlag;
+    }
 
     public int getId() {
         return id;

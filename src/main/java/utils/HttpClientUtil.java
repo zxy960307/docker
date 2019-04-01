@@ -16,6 +16,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 /**
  * Created by 41463 on 2019/3/14.
@@ -213,5 +214,16 @@ public class HttpClientUtil {
         }
 
         return response;
+    }
+
+    public static boolean ping(String ipAddress)  {
+        int  timeOut =  3000 ;  //超时应该在3钞以上
+        try {
+            return InetAddress.getByName(ipAddress).isReachable(timeOut);
+            // 当返回值是true时，说明host是可用的，false则不可。
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

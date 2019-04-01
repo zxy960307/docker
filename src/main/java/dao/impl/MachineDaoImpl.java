@@ -4,6 +4,7 @@ import dao.IMachineDao;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import utils.DBCUtil;
 import vo.Container;
 import vo.Image;
@@ -25,7 +26,28 @@ public class MachineDaoImpl implements IMachineDao {
 
     @Override
     public boolean doCreate(Machine vo) throws SQLException {
-        return false;
+
+        //初始化
+        vo.setCreateTime( new Timestamp(System.currentTimeMillis()));//vo中设置时间
+
+        //完成插入操作
+        QueryRunner qr = new QueryRunner();
+        int result = 0;
+        String sql = "INSERT IGNORE INTO machine(name,ip,status,create_time ) " +
+                "VALUES (?,?,?,?)";//定义sql插入语句
+        try {
+            result = qr.update(conn,sql,vo.getName(),vo.getIp(),vo.getStatus(),vo.getCreateTime());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DbUtils.close(conn);
+        }
+
+        //检查结果
+        if (result != 0)
+            return  true;
+        else
+            return false;
     }
 
     @Override
@@ -88,7 +110,79 @@ public class MachineDaoImpl implements IMachineDao {
 
     @Override
     public Integer getAllCount(String column, String keyWord) throws SQLException {
-        return null;
+        String sql = "SELECT COUNT(*) FROM machine WHERE " + column + " LIKE ? ";
+        QueryRunner qr = new QueryRunner();
+        Integer result = 0;
+        try {
+            result = Integer.parseInt(String.valueOf(qr.query(conn,sql,new ScalarHandler(),"%" + keyWord + "%")));
+        }catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("查询所有machine数量失败。");
+            return null;
+        } finally {
+            DbUtils.close(conn);
+        }
+
+        return result;
     }
 
+    @Override
+    public List<Machine> getAllMachinesPag(String clown, String keyWord, Integer currentPage, Integer lineSize) throws SQLException {
+        //查询所有machine
+        List<Object[]> result = new ArrayList<>();
+        QueryRunner qr = new QueryRunner();
+        String sql = "SELECT id,name,ip,status,create_time " +
+                " FROM machine WHERE " + clown + " LIKE ? LIMIT ?,?";
+        Object[] params = new Object[3];
+        params[0]="%" + keyWord + "%";
+        params[1]=(currentPage.intValue() - 1) * lineSize.intValue();
+        params[2] = lineSize.intValue();//currentPage.intValue() *
+        try {result=qr.query(conn,sql,new ArrayListHandler(),params);
+        } catch (SQLException e) {
+            System.out.println("分页获取machine表所有信息异常。");
+            e.printStackTrace();
+            return null;
+        } finally {
+            DbUtils.close(conn);
+        }
+
+        //封装结果
+        //判断结果是否为空
+        if (result.size() <= 0) {
+            System.out.println("获取machine表所有信息为空。");
+            return new ArrayList<Machine>();
+        }
+        List<Machine> machineResult = new ArrayList<>();//存放封装后的结果
+        for(Object[] container:result) {
+            Machine temp = new Machine();
+            temp.setId(Integer.parseInt(String.valueOf(container[0])));
+            temp.setName((String) container[1]);
+            temp.setIp((String) container[2]);
+            temp.setStatus((Integer) container[3]);
+            temp.setCreateTime((Timestamp) container[4]);
+            machineResult.add(temp);
+        }
+        return machineResult;
+    }
+
+    @Override
+    public boolean removeById(int id) throws Exception {
+
+        QueryRunner qr = new QueryRunner();
+        int result = 0;
+        String sql = "DELETE FROM machine WHERE id = ?";
+        try {
+            result = qr.update(conn,sql,id);
+            if (result != 0) {
+                return true;
+            }
+            else return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }finally {
+            DbUtils.close(conn);
+        }
+
+    }
 }
