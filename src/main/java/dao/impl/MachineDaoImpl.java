@@ -185,4 +185,27 @@ public class MachineDaoImpl implements IMachineDao {
         }
 
     }
+
+    @Override
+    public boolean changeStatus(int id, int changeStatus) throws SQLException {
+        //更新字段
+        QueryRunner qr = new QueryRunner();
+        int result = 0;
+        String sql = "UPDATE machine SET status = ? WHERE id = ?";
+        Object[] params = {changeStatus,id};
+        try {
+            result = qr.update(conn,sql,params);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DbUtils.close(conn);
+        }
+
+        //检查结果
+        if (result != 0) {
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -43,6 +43,9 @@ public class MachineServlet  extends HttpServlet {
             else if("deleteMachine".equals(status)) {
                 path = this.deleteMachine(req);
             }
+            else if("changeMachineStatus".equals(status)) {
+                path = this.changeMachineStatus(req);
+            }
         }
         req.getRequestDispatcher(path).forward(req,resp);
     }
@@ -246,7 +249,54 @@ public class MachineServlet  extends HttpServlet {
      * @return
      */
     public String changeMachineStatus(HttpServletRequest req) {
-        return  "";
+
+
+        //初始化
+        String url = allMachinesSplitServletUrl;
+        String msg = "";
+        boolean msgStatus = true;
+        req.setAttribute("url",url);
+
+        //获得参数
+        int status = Integer.parseInt(req.getParameter("status"));
+        int id = Integer.parseInt(req.getParameter("id"));
+        int changeStatus ;
+        if (status == 0)
+            changeStatus = 1;
+        else if (status == 1)
+            changeStatus = 0;
+        else {
+            msg = "修改状态时参数错误。";
+            msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStauts",msgStatus);
+            return forwardJspUrl;
+        }
+
+        //调用相关函数更改数据库记录
+        boolean changeResult = true;
+        try {
+            changeResult = ServiceFactory.MachineServiceInstance().changeStatus(id,changeStatus);
+        } catch (Exception e) {
+            msg = "修改状态时操作数据库异常。";
+            msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStauts",msgStatus);
+            return forwardJspUrl;
+        }
+        if (changeResult == false) {
+            msg = "修改状态时操作数据库失败。";
+            msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStauts",msgStatus);
+            return forwardJspUrl;
+        }
+
+        msg = "修改状态成功。";
+        msgStatus = true;
+        req.setAttribute("msg",msg);
+        req.setAttribute("msgStauts",msgStatus);
+        return forwardJspUrl;
     }
 
 }

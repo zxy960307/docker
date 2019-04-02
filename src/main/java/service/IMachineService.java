@@ -19,4 +19,5 @@ public interface IMachineService {
     public Map<String,Object> getAllMachinesPag(String paramString1, String paramString2,
                                                   Integer paramInteger1, Integer paramInteger2) throws Exception;
 
+    public boolean changeStatus(int id,int changeStatus) throws Exception;
 }

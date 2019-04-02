@@ -58,4 +58,14 @@ public class MachineServiceImpl implements IMachineService {
             return null;
         }
     }
+
+    @Override
+    public boolean changeStatus(int id, int changeStatus) throws Exception {
+        try {
+            return MachineFactory.MachineInstance().changeStatus(id,changeStatus);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

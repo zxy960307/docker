@@ -25,4 +25,6 @@ public interface IMachineDao extends IDAO<Integer, Machine> {
     public List<Machine> getAllMachinesPag(String clown, String keyWord,
                                            Integer currentPage, Integer lineSize) throws SQLException;
 
+    public boolean changeStatus(int id,int changeStatus) throws SQLException;
+
 }

@@ -73,7 +73,7 @@
                                         </button>
                                         <ul class="dropdown-menu" role="menu">
                                                 <li>
-                                                    <a href="">改变机器状态</a>
+                                                    <a href="/machine/changeMachineStatus?status=${machine.status}&id=${machine.id}">改变机器状态</a>
                                                 </li>
                                                 <li>
                                                     <a href="/machine/deleteMachine?id=${machine.id}">删除机器</a>
