@@ -78,6 +78,7 @@ public class ContainerServlet extends HttpServlet {
 
         //获取创建容器的类型
         String containerImage = req.getParameter("image");
+        containerImage = containerImage.substring(containerImage.indexOf("/")+1,containerImage.length());
         //获取容器名
         String name = req.getParameter("name");//暂时不处理
         //获取docker服务器ip地址

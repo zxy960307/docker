@@ -9,9 +9,9 @@ public class Test {
     public Test(){}
 
     public void testJson(){
-        //String path = Test.class.getClassLoader().getResource("/container/json/mysql.json").getPath();
-        System.out.println("C:\\Users\\41463\\IdeaProjects\\docker\\src\\main\\resources\\container\\json\\mysql.json");
-        JSONObject jobj = FileUtil.readJsonFile("C:\\Users\\41463\\IdeaProjects\\docker\\src\\main\\resources\\container\\json\\mysql.json");
+        //String path = Test.class.getClassLoader().getResource("/container/json/mysqlzxy.json").getPath();
+        System.out.println("C:\\Users\\41463\\IdeaProjects\\docker\\src\\main\\resources\\container\\json\\mysqlzxy.json");
+        JSONObject jobj = FileUtil.readJsonFile("C:\\Users\\41463\\IdeaProjects\\docker\\src\\main\\resources\\container\\json\\mysqlzxy.json");
         //System.out.println(jobj);
         JSONObject res = HttpClientUtil.doPost("http://192.168.43.230:2375/containers/create",jobj);
         //System.out.println(res.get("0").toString());
