@@ -30,4 +30,11 @@ public interface IContainerDao extends IDAO<String, Container>{
     public List<Container> getAllContainersPag(String clown, String keyWord, Integer currentPage, Integer lineSize) throws SQLException;
 
     public boolean updateContainerStatus(int status,String containerId) throws SQLException;
+
+    /**
+     * 获取表中最后一条记录的id值
+     * @return
+     * @throws SQLException
+     */
+    public int getLastId() throws SQLException;
 }

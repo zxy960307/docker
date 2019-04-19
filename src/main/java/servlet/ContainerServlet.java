@@ -3,6 +3,7 @@ package servlet;
 import factory.MachineFactory;
 import factory.ServiceFactory;
 import net.sf.json.JSON;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import utils.FileUtil;
 import utils.GeneralUtil;
@@ -78,7 +79,7 @@ public class ContainerServlet extends HttpServlet {
 
         //获取创建容器的类型
         String containerImage = req.getParameter("image");
-        containerImage = containerImage.substring(containerImage.indexOf("/")+1,containerImage.length());
+        containerImage = containerImage.substring(containerImage.indexOf("/")+1,containerImage.indexOf(":"));
         //获取容器名
         String name = req.getParameter("name");//暂时不处理
         //获取docker服务器ip地址
@@ -87,8 +88,43 @@ public class ContainerServlet extends HttpServlet {
         String path = this.getClass().getResource("/container/json/" + containerImage + ".json").getPath();
         String machineUrl ="http://"+machineIp+"/containers/create";
         //docker服务器响应结果
-        JSONObject response = HttpClientUtil.doPost(machineUrl, FileUtil.readJsonFile(path));
+        JSONObject json = FileUtil.readJsonFile(path);
+        //获取端口号
+        int port = -1;
+        try {
+            port = ServiceFactory.ContainerServiceInstance().getPort();
+        } catch (Exception e) {
+            e.printStackTrace();
+            msg = "创建容器时配置端口号异常";
+            msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            url = "/pages/index.jsp";
+            req.setAttribute("url",url);
+            return forwardJspUrl;
 
+        }
+        if (port == -1) {
+            msg = "创建容器时配置端口号失败。";
+            msgStatus = false;
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            url = "/pages/index.jsp";
+            req.setAttribute("url",url);
+            return forwardJspUrl;
+        }
+        //json中修改端口号
+        JSONObject hostConfig = (JSONObject) json.get("HostConfig");
+        JSONObject PortBindings = (JSONObject)hostConfig.get("PortBindings");
+        JSONArray tcp = (JSONArray) PortBindings.get("3306/tcp");
+        JSONObject tcpBody = (JSONObject) tcp.get(0);
+        tcpBody.put("HostPort",String.valueOf(port));
+        tcp.set(0,tcpBody);
+        PortBindings.put("3306/tcp",tcp);
+        hostConfig.put("PortBindings",PortBindings);
+        json.put("HostConfig",hostConfig);
+
+        JSONObject response = HttpClientUtil.doPost(machineUrl, json);
         //容器创建成功
         if (response != null) {
             //获取容器id
@@ -97,6 +133,7 @@ public class ContainerServlet extends HttpServlet {
 
             //将创建数据写入数据库
             Container container = new Container();//定义Container对象
+            container.setPort(String.valueOf(port));
             container.setContainerId(containerId);
             container.setCreateAdminId(1);//默认管理员id为1
             container.setImage(containerImage);//设置容器镜像
@@ -374,7 +411,7 @@ public class ContainerServlet extends HttpServlet {
             return forwardJspUrl;
         }
         //检查结果
-        if (containers.size()<=0) {
+        if (containers == null || containers.size()<=0) {
             msg = "获取容器信息列表为空。";
             msgStatus = false;
             req.setAttribute("msg",msg);

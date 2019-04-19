@@ -58,7 +58,7 @@
                                 <td>${container.image}</td>
                                 <td>${container.createAdminId}</td>
                                 <td>${container.createTime}</td>
-                                <td>22</td>
+                                <td>${container.port}</td>
                                 <td>${container.machineIp}</td>
                                 <td><div class="btn-group">
                                     <button type="button" class="btn btn-default dropdown-toggle btn-sm"
@@ -73,12 +73,7 @@
                                         </c:if>
                                         <c:if test="${container.status==1 }">
                                             <li>
-                                                <a href="#">暂停</a>
-                                            </li>
-                                        </c:if>
-                                        <c:if test="${container.status==3}">
-                                            <li>
-                                                <a href="#">取消暂停</a>
+                                                <a href="#">停止</a>
                                             </li>
                                         </c:if>
                                         <c:if test="${container.status!=6 }">

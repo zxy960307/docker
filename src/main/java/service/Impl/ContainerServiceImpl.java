@@ -102,4 +102,21 @@ public class ContainerServiceImpl implements IContainerService {
         }
         return false;
     }
+
+    @Override
+    public int getPort() throws Exception {
+
+        try {
+            int id = ContainerFactory.ContainerInstance().getLastId();
+            if (id == -1) {
+                return -1;
+            }
+            else
+                return 40000+id;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
 }

@@ -38,11 +38,11 @@ public class ContainerDaoImpl implements IContainerDao {
         //完成插入操作
         QueryRunner qr = new QueryRunner();
         int result = 0;
-        String sql = "INSERT INTO container(container_id,create_admin_id,create_time,status,image,machine_ip) " +
-                "VALUES (?,?,?,?,?,?)";//定义sql插入语句
+        String sql = "INSERT INTO container(container_id,create_admin_id,create_time,status,image,machine_ip,port) " +
+                "VALUES (?,?,?,?,?,?,?)";//定义sql插入语句
         try {
             result = qr.update(conn,sql,vo.getContainerId(),vo.getCreateAdminId(),
-                    vo.getCreateTime(),vo.getStatus(),vo.getImage(),vo.getMachineIp());
+                    vo.getCreateTime(),vo.getStatus(),vo.getImage(),vo.getMachineIp(),vo.getPort());
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -196,7 +196,7 @@ public class ContainerDaoImpl implements IContainerDao {
         //查询所有status!=6的容器
         List<Object[]> result = new ArrayList<>();
         QueryRunner qr = new QueryRunner();
-        String sql = "SELECT id,container_id,create_admin_id,create_time,status,image,machine_ip" +
+        String sql = "SELECT id,container_id,create_admin_id,create_time,status,image,machine_ip,port" +
                 " FROM container WHERE " + clown + " LIKE ? AND status <> 6 LIMIT ?,?";
         Object[] params = new Object[3];
         params[0]="%" + keyWord + "%";
@@ -226,6 +226,7 @@ public class ContainerDaoImpl implements IContainerDao {
             temp.setStatus((Integer)container[4]);
             temp.setImage((String)container[5]);
             temp.setMachineIp((String)container[6]);
+            temp.setPort((String)container[7]);
             containerResult.add(temp);
         }
 
@@ -254,5 +255,31 @@ public class ContainerDaoImpl implements IContainerDao {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public int getLastId() throws SQLException {
+
+        //初始化
+
+        //查询最后一条记录的id值
+        QueryRunner qr = new QueryRunner();
+        Container result = new Container();//记录查询结果
+        String sql = " select id from container order by id DESC limit 1;";
+        Map<String,Object> resultMap = new HashMap<String,Object>();
+        try {
+            resultMap = qr.query(conn,sql,new MapHandler());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("查询最后一条记录id异常。");
+            return -1;
+        } finally {
+            DbUtils.close(conn);
+        }
+
+        //处理结果
+        int id = Integer.parseInt(String.valueOf((long)resultMap.get("id")));
+
+        return id;
     }
 }

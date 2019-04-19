@@ -9,22 +9,19 @@
   "OpenStdin": false,
   "StdinOnce": false,
   "Env": [
-    "MYSQL_ROOT_PASSWORD=zxy123456",
-    "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-    "GOSU_VERSION=1.7",
-    "MYSQL_MAJOR=5.6",
-    "MYSQL_VERSION=5.6.43-1debian9"
   ],
   "Cmd": [
+    "sh",
+    "/mysql/setup.sh",
     "mysqld"
   ],
-  "Image": "zhangxingyu/mysqlzxy:1.1",
+  "Image": "zhangxingyu/mysqlzxy:1.23",
   "Volumes": {},
   "WorkingDir": "",
   "HostConfig": {
     "Memory": 0,
     "MemorySwap": 0,
-    "PublishAllPorts": true,
+    "PublishAllPorts": false,
     "Privileged": false,
     "Dns": [
       "8.8.8.8"
@@ -32,6 +29,14 @@
     "VolumesFrom": [
       "volume_parent"
     ],
+    "PortBindings": {
+      "3306/tcp": [
+        {
+          "HostIp": "0.0.0.0",
+          "HostPort": "3309"
+        }
+      ]
+    },
     "LogConfig": {
       "Type": "json-file",
       "Config": {}

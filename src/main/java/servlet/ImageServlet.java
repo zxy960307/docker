@@ -195,6 +195,11 @@ public class ImageServlet extends HttpServlet {
             }
         }
 
+
+        //将数据库中所有imge记录与result对比，若result不存在则删除该记录
+
+
+
         msgStatus = true;
         msg = "同docker服务器更新镜像信息成功。";
         req.setAttribute("msg",msg);

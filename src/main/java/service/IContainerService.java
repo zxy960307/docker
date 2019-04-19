@@ -58,4 +58,10 @@ public interface IContainerService {
                                                   Integer paramInteger1, Integer paramInteger2) throws Exception;
 
     public boolean updateContainerStatus(int status,String containerId) throws Exception;
+
+    /**
+     * 获取容器当前可用端口号
+     * @return
+     */
+    public int getPort() throws Exception;
 }

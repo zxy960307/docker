@@ -16,6 +16,15 @@ public class Container {
     private int status;
     private String image;
     private int id;
+    private String port;
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
 
     public String getMachineIp() {
         return machineIp;

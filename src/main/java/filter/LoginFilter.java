@@ -19,7 +19,8 @@ public class LoginFilter implements Filter
 
     //不被拦截的请求路径
     private static final List<String> unFilterUrlList = Arrays.
-            asList("/pages/login/login.jsp","/login/doLogin","/login/loginOut","/pages/forward.jsp");
+            asList("/pages/login/login.jsp","/login/doLogin","/login/loginOut","/pages/forward.jsp"
+            ,"http://localhost:8081/","http://localhost:8081/docker");
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
