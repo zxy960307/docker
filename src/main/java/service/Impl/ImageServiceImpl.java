@@ -46,4 +46,14 @@ public class ImageServiceImpl implements IImageService {
         }
         return null;
     }
+
+    @Override
+    public boolean deleteByImageId(String imageId) throws Exception {
+        try {
+            return ImageFactory.ImageInstance().deleteByImageId(imageId);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

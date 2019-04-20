@@ -114,13 +114,19 @@ public class ContainerServlet extends HttpServlet {
             return forwardJspUrl;
         }
         //json中修改端口号
+        String containerPort="";//容器要映射的端口号
+        if(containerImage.equals("mysqlzxy"))
+            containerPort = "3306/tcp";
+        else if (containerImage.equals("tomcatzxy"))
+            containerPort = "8080/tcp";
         JSONObject hostConfig = (JSONObject) json.get("HostConfig");
         JSONObject PortBindings = (JSONObject)hostConfig.get("PortBindings");
-        JSONArray tcp = (JSONArray) PortBindings.get("3306/tcp");
+        JSONArray tcp = (JSONArray) PortBindings.get(containerPort);
         JSONObject tcpBody = (JSONObject) tcp.get(0);
         tcpBody.put("HostPort",String.valueOf(port));
         tcp.set(0,tcpBody);
-        PortBindings.put("3306/tcp",tcp);
+
+        PortBindings.put(containerPort,tcp);
         hostConfig.put("PortBindings",PortBindings);
         json.put("HostConfig",hostConfig);
 
@@ -159,7 +165,7 @@ public class ContainerServlet extends HttpServlet {
 
         req.setAttribute("msg",msg);
         req.setAttribute("msgStatus",msgStatus);
-        url = "/pages/container/container_create.jsp";
+        url = "/container/createPro";
         req.setAttribute("url",url);
 
 

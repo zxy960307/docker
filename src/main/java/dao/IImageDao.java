@@ -15,4 +15,6 @@ public interface IImageDao extends IDAO<Integer, Image> {
                                        Integer currentPage, Integer lineSize) throws SQLException;
 
     public List<Image> getMachineImages(String machineIp) throws SQLException;
+
+    public boolean deleteByImageId(String imageId) throws SQLException;
 }

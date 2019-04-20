@@ -59,7 +59,7 @@ public class ImageServlet extends HttpServlet {
         String msg = ""; //表示提示信息
         String url = "/pages/index.jsp";
         Integer currentPage = Integer.valueOf(1);
-        Integer lineSize = Integer.valueOf(3);
+        Integer lineSize = Integer.valueOf(6);
         req.setAttribute("url",url);
 
         //同docker服务器更新数据并更新数据库信息
@@ -108,7 +108,7 @@ public class ImageServlet extends HttpServlet {
         }
 
         //封装结果
-        req.setAttribute("url","/images/getAllImagesSplit");//复写url信息
+        req.setAttribute("url","/image/getAllImagesSplit");//复写url信息
         msg = "获取镜像分页信息成功";
         req.setAttribute("currentPage", currentPage);
         req.setAttribute("lineSize", lineSize);
@@ -197,6 +197,62 @@ public class ImageServlet extends HttpServlet {
 
 
         //将数据库中所有imge记录与result对比，若result不存在则删除该记录
+        for (int i =0;i<allMachines.size();i++) {
+            //数据库中每台机器image与服务器中的机器Image比对，不存在则删除
+            List<Image> images = new ArrayList<>();
+            try {
+                images = ServiceFactory.ImageServiceInstance().getMachineImages(allMachines.get(i).getIp());
+            }catch (Exception e) {
+                e.printStackTrace();
+                msgStatus = false;
+                req.setAttribute("msgStatus",msgStatus);
+                req.setAttribute("msg",msg);
+                msg = "数据库image数据与docker服务器同步时异常。";
+                return ;
+            }
+            if (images.size() == 0) {
+                msgStatus = false;
+                req.setAttribute("msgStatus",msgStatus);
+                req.setAttribute("msg",msg);
+                msg = "docker服务器中没有image。";
+                return ;
+            }
+
+            for (int j =0;j<images.size();j++) {
+                boolean imageJudgeResult = false;//表示判断结果，若该image在docker服务器中存在，则为true;否则false
+                for (int m =0;m<results.size();m++) {
+                    if (images.get(j).getImageId().equals(results.get(m).getImageId()))
+                    {
+                        imageJudgeResult = true;
+                        break;
+                    }
+                }
+
+                //若docker服务器中没有该imageId下的image，则从数据库中删除该条记录
+                if (imageJudgeResult == false) {
+                    boolean result = false;
+                    try {
+                        result = ServiceFactory.ImageServiceInstance().
+                                deleteByImageId(images.get(j).getImageId());
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                        msgStatus = false;
+                        req.setAttribute("msgStatus",msgStatus);
+                        req.setAttribute("msg",msg);
+                        msg = "删除image中相关记录异常。";
+                        return ;
+                    }
+                    if (result == false) {
+                        msgStatus = false;
+                        req.setAttribute("msgStatus",msgStatus);
+                        req.setAttribute("msg",msg);
+                        msg = "删除image中相关记录失败。";
+                        return ;
+                    }
+                }
+            }
+
+        }
 
 
 

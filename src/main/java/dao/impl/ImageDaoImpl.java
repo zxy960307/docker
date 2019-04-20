@@ -159,4 +159,28 @@ public class ImageDaoImpl  implements IImageDao {
 
         return imageResults;
     }
+
+    @Override
+    public boolean deleteByImageId(String imageId) throws SQLException {
+
+        QueryRunner queryRunner = new QueryRunner();
+        String sql = "DELETE FROM image WHERE image_id = ?";
+        int result = 0;
+        try {
+            result = queryRunner.update(conn,sql,imageId);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("删除image记录时异常。");
+            return false;
+        }
+
+        if(result != 0)
+            return true;
+        else
+        {
+            System.out.println("删除image记录时失败。");
+            return false;
+        }
+    }
 }

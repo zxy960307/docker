@@ -1,0 +1,44 @@
+{
+  "Hostname": "",
+  "Domainname": "",
+  "User": "",
+  "AttachStdin": false,
+  "AttachStdout": true,
+  "AttachStderr": true,
+  "Tty": false,
+  "OpenStdin": false,
+  "StdinOnce": false,
+  "Env": [
+  ],
+  "Cmd": [
+  ],
+  "Image": "zhangxingyu/tomcatzxy:1.3",
+  "Volumes": {},
+  "WorkingDir": "",
+  "HostConfig": {
+    "Memory": 0,
+    "MemorySwap": 0,
+    "PublishAllPorts": false,
+    "Privileged": false,
+    "Dns": [
+      "8.8.8.8"
+    ],
+    "VolumesFrom": [
+      "volume_parent"
+    ],
+    "PortBindings": {
+      "8080/tcp": [
+        {
+          "HostIp": "0.0.0.0",
+          "HostPort": "3309"
+        }
+      ]
+    },
+    "LogConfig": {
+      "Type": "json-file",
+      "Config": {}
+    },
+    "CgroupParent": "",
+    "VolumeDriver": ""
+  }
+}
