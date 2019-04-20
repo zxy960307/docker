@@ -73,7 +73,7 @@
                                         </c:if>
                                         <c:if test="${container.status==1 }">
                                             <li>
-                                                <a href="#">停止</a>
+                                                <a href="/container/stopContainer?containerId=${container.containerId}&machineIp=${container.machineIp}">停止</a>
                                             </li>
                                         </c:if>
                                         <c:if test="${container.status!=6 }">

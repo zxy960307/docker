@@ -197,7 +197,7 @@ public class ContainerDaoImpl implements IContainerDao {
         List<Object[]> result = new ArrayList<>();
         QueryRunner qr = new QueryRunner();
         String sql = "SELECT id,container_id,create_admin_id,create_time,status,image,machine_ip,port" +
-                " FROM container WHERE " + clown + " LIKE ? AND status <> 6 LIMIT ?,?";
+                " FROM container WHERE " + clown + " LIKE ? AND status <> 6 order by id DESC LIMIT ?,?";
         Object[] params = new Object[3];
         params[0]="%" + keyWord + "%";
         params[1]=(currentPage.intValue() - 1) * lineSize.intValue();

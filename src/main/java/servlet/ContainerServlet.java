@@ -62,6 +62,9 @@ public class ContainerServlet extends HttpServlet {
             else if("createPro".equals(status)) {
                 path = this.createPro(req);
             }
+            else if("stopContainer".equals(status)) {
+                path = this.stopContainer(req);
+            }
         }
         req.getRequestDispatcher(path).forward(req,resp);
     }
@@ -602,6 +605,37 @@ public class ContainerServlet extends HttpServlet {
         //返回结果
         req.setAttribute("allMachines",allMachines);
         return "/pages/container/container_create.jsp";
+    }
+
+    public String stopContainer(HttpServletRequest req) {
+
+        //提示信息
+        String msg = "";
+        String url = "/container/getAllContainers";
+        req.setAttribute("url",url);
+        boolean msgStatus = true;
+
+
+        //获取请求参数
+        String containerId = req.getParameter("containerId");
+        String machineIp = req.getParameter("machineIp");
+
+        //封装url
+        String stopUrl = "Http://"+machineIp+"/containers/"+containerId+"/stop";
+        JSONObject res = HttpClientUtil.doPost(stopUrl);
+        if (res == null) {
+            msgStatus = false;
+            msg = "停止容器时与docker服务器通信异常。";
+            req.setAttribute("msg",msg);
+            req.setAttribute("msgStatus",msgStatus);
+            return forwardJspUrl;
+        }
+
+        msg = "停止容器成功。";
+        req.setAttribute("msgStatus",msgStatus);
+        req.setAttribute("msg",msg);
+
+        return forwardJspUrl;
     }
 
 }
