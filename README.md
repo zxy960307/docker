@@ -19,4 +19,4 @@
          
          3 数据库：mysql+dbutils构建数据库
          
-         3 与docker服务器通信：利用daemon完成与远程docker服务器通信
+         4 与docker服务器通信：利用Docker Daemon和相关api完成与远程docker服务器通信
