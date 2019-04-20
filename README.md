@@ -17,4 +17,6 @@
          
          2 后端：传统servlet和自己搭建的mvc框架完成后台逻辑部分
          
+         3 数据库：mysql+dbutils构建数据库
+         
          3 与docker服务器通信：利用daemon完成与远程docker服务器通信
