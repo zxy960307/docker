@@ -24,6 +24,26 @@ public class ImageServiceImpl implements IImageService {
     }
 
     @Override
+    public boolean insertImage(Image image) throws Exception {
+        try {
+            return ImageFactory.ImageInstance().insertImage(image);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isImageExit(Image image) throws Exception {
+        try {
+            return ImageFactory.ImageInstance().isImageExit(image);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
     public Map<String, Object> getAllImagesPag(String paramString1, String paramString2, Integer paramInteger1, Integer paramInteger2) throws Exception {
         Map<String,Object> result = new HashMap<>();
         try {

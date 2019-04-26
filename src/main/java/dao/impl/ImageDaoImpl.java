@@ -4,15 +4,14 @@ import dao.IImageDao;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
+import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import utils.DBCUtil;
 import vo.Image;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by 41463 on 2019/3/30.
@@ -182,5 +181,50 @@ public class ImageDaoImpl  implements IImageDao {
             System.out.println("删除image记录时失败。");
             return false;
         }
+    }
+
+    @Override
+    public boolean isImageExit(Image image) throws SQLException {
+        Map<String,Object> result = new HashMap<>();//储存第一条结果
+
+        //获得表中信息
+        QueryRunner qr = new QueryRunner();
+        String sql = "SELECT id  FROM image " +
+                "WHERE image_id = ? AND machine_ip = ?";
+        try {
+            result=qr.query(conn,sql,new MapHandler(),image.getImageId(),image.getMachineIp());
+        } catch (SQLException e) {
+            System.out.println("判断镜像是否存在时异常。");
+            e.printStackTrace();
+        } finally {
+            DbUtils.close(conn);
+        }
+
+        //封装结果
+        if (result == null || result.size() == 0) {
+            System.out.println("镜像不存在。");
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean insertImage(Image image) throws SQLException {
+        //完成插入操作
+        QueryRunner qr = new QueryRunner();
+
+        int result = 0;
+        String sql = "INSERT INTO image (image_id,repo_tags,machine_ip) " +
+                "VALUES (?,?,?)";//定义sql插入语句
+        try {
+            qr.update(conn,sql,image.getImageId(),image.getRepoTags(),image.getMachineIp());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            DbUtils.close(conn);
+        }
+        return true;
     }
 }

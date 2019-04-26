@@ -154,10 +154,19 @@ public class ImageServlet extends HttpServlet {
             req.setAttribute("msg",msg);
             return ;
         }
+        //从allMachines中删除所有无法ping通的machine
+        List<Machine> allMachinesPing = new ArrayList<>();
+        for (int i =0 ;i<allMachines.size();i++) {
+            String ip = allMachines.get(i).getIp().substring(0,allMachines.get(i).getIp().indexOf(":"));
+            if (HttpClientUtil.ping(ip))
+            {
+                allMachinesPing.add(allMachines.get(i));
+            }
+        }
 
         //与docker服务器通信
         List<String> urls = new ArrayList<>();//存放通信的url
-        for (Machine machine:allMachines) {
+        for (Machine machine:allMachinesPing) {
             String urlTemp = "http://";
             urlTemp = urlTemp+machine.getIp()+"/images/json";
             urls.add(urlTemp);
@@ -178,13 +187,17 @@ public class ImageServlet extends HttpServlet {
         //通过image_id检查记录是否存在，若不存在则更新记录
         for (Image image:results) {
             try {
-                if (!ServiceFactory.ImageServiceInstance().insertNotExit(image)) {
-                    msgStatus = false;
-                    req.setAttribute("msgStatus",msgStatus);
-                    msg = "向数据库插入镜像数据时失败。";
-                    req.setAttribute("msg",msg);
-                    return ;
+                if (!ServiceFactory.ImageServiceInstance().isImageExit(image))
+                {
+                    if (!ServiceFactory.ImageServiceInstance().insertImage(image)) {
+                        msgStatus = false;
+                        req.setAttribute("msgStatus",msgStatus);
+                        msg = "向数据库插入镜像数据时失败。";
+                        req.setAttribute("msg",msg);
+                        return ;
+                    }
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
                 msgStatus = false;
@@ -197,11 +210,11 @@ public class ImageServlet extends HttpServlet {
 
 
         //将数据库中所有imge记录与result对比，若result不存在则删除该记录
-        for (int i =0;i<allMachines.size();i++) {
+        for (int i =0;i<allMachinesPing.size();i++) {
             //数据库中每台机器image与服务器中的机器Image比对，不存在则删除
             List<Image> images = new ArrayList<>();
             try {
-                images = ServiceFactory.ImageServiceInstance().getMachineImages(allMachines.get(i).getIp());
+                images = ServiceFactory.ImageServiceInstance().getMachineImages(allMachinesPing.get(i).getIp());
             }catch (Exception e) {
                 e.printStackTrace();
                 msgStatus = false;

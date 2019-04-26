@@ -17,4 +17,8 @@ public interface IImageDao extends IDAO<Integer, Image> {
     public List<Image> getMachineImages(String machineIp) throws SQLException;
 
     public boolean deleteByImageId(String imageId) throws SQLException;
+
+    public boolean isImageExit(Image image) throws SQLException;
+
+    public boolean insertImage(Image image) throws SQLException;
 }

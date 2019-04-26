@@ -1,5 +1,6 @@
 package service;
 
+import dao.IMachineDao;
 import vo.Image;
 
 import java.util.List;
@@ -28,5 +29,21 @@ public interface IImageService {
      * @throws Exception
      */
     public boolean deleteByImageId(String imageId) throws Exception;
+
+    /**
+     * 判断机器中是否已存在该image
+     * @param image
+     * @return 若存在返回true;否则返回false
+     * @throws Exception
+     */
+    public boolean isImageExit(Image image) throws Exception;
+
+    /**
+     * 向image表中插入单条数据
+     * @param image
+     * @return
+     * @throws Exception
+     */
+    public boolean insertImage(Image image) throws Exception;
 
 }
