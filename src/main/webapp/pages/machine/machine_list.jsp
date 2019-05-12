@@ -40,9 +40,9 @@
                         <thead>
                         <tr>
                             <th>id</th>
-                            <th>name</th>
+                            <th>命名</th>
                             <th>ip</th>
-                            <th>status</th>
+                            <th>状态</th>
                             <th>网络状态</th>
                             <th>操作</th>
                         </tr>
@@ -106,20 +106,6 @@
         <%--if("${alertFlag}" == "true")--%>
                 <%--alert("${msg}");--%>
     <%--};--%>
-    function updateContainers(){
-        $.ajax({
-            url:"${basePath}"+"container/updateContainers",
-            type:"GET",
-            success:function(data){
-                alert(JSON.stringify(data));
-                window.location.href="${bastPath}"+"container/getAllContainers";
-            },
-            error:function(data){
-                console.log(data);
-                window.location.href="${bastPath}"+"container/getAllContainers";
-            }
-        });
-    }
 </script>
 </body>
 </html>

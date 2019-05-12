@@ -34,7 +34,7 @@
                     <div style="padding: 50px 100px 10px;">
                         <form class="bs-example bs-example-form" role="form" method="get" action="/machine/createMachine">
                         <div class="input-group col-lg-8 col-md-offset-2">
-                            <span class="input-group-addon">name</span>
+                            <span class="input-group-addon">命名</span>
                             <input type="text" class="form-control " placeholder="twitterhandle" name="name">
                         </div>
                         <br>
@@ -63,35 +63,6 @@
 <script src="assets/js/jquery.metisMenu.js"></script>
 <script src="assets/js/custom.js"></script>
 <script>
-    //    $("#create-container").onclick(function(){
-    //        layer.open({
-    //            type:2,
-    //            content:,
-    //            title:'创建容器',
-    //        });
-    //    })
-    function getImages() {
-        var machineIp = $("#machineSelect").val();
-        $.ajax({
-            url:"${basePath}"+"image/getMachineImages",
-            type:"GET",
-            contentType:'application/json;charset=UTF-8',
-            data:{"machineIp":machineIp},
-            dataType:"json",
-            success:function(data){
-                console.log(data.length);
-                var html = "";
-                for (var i =0;i<data.length;i++) {
-                    html+="<option value="+data[i].repoTags+">"+data[i].repoTags+"</option>";
-                }
-                $("#imageSelect").append(html);
-            },
-            error:function(data){
-                alert("获取machine相关镜像失败");
-                window.location.href="${bastPath}"+"pages/index.jsp";
-            }
-        });
-    }
 </script>
 </body>
 </html>

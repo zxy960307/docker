@@ -33,14 +33,14 @@
                 <div class="panel-body">
                     <div style="padding: 50px 100px 10px;">
                         <form class="bs-example bs-example-form" role="form" method="get" action="/container/createContainer">
-                        <div class="input-group col-lg-8 col-md-offset-2">
-                            <span class="input-group-addon">name</span>
-                            <input type="text" class="form-control " placeholder="twitterhandle" name="name">
-                        </div>
+                        <%--<div class="input-group col-lg-8 col-md-offset-2">--%>
+                            <%--<span class="input-group-addon">name</span>--%>
+                            <%--<input type="text" class="form-control " placeholder="twitterhandle" name="name">--%>
+                        <%--</div>--%>
                         <br>
                             <div class="input-group col-lg-8 col-md-offset-2">
                                 <%--<label for="imageSelect">选择列表</label>--%>
-                                <span class="input-group-addon">machine</span>
+                                <span class="input-group-addon">机器</span>
                                 <select class="form-control" id="machineSelect" name="machine" onchange="getImages()">
                                     <option value="">请选择机器</option>
                                         <c:forEach items="${allMachines}" var="machine">
@@ -50,7 +50,7 @@
                             </div>
                             </br>
                         <div class="input-group col-lg-8 col-md-offset-2">
-                            <span class="input-group-addon">image</span>
+                            <span class="input-group-addon">镜像</span>
                             <select class="form-control" id="imageSelect" name="image">
                                 <option value="" >选择镜像</option>
                             </select>

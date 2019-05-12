@@ -130,8 +130,6 @@ public class ImageServlet extends HttpServlet {
         boolean msgStatus = true;//表示执行状态
         String msg = ""; //表示提示信息
         String url = "/pages/index.jsp";
-        Integer currentPage = Integer.valueOf(1);
-        Integer lineSize = Integer.valueOf(4);
         req.setAttribute("url",url);
 
         //获取所有机器信息

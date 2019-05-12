@@ -39,9 +39,9 @@
                     <table class="table table-striped">
                         <thead>
                         <tr>
-                            <th>image_id</th>
-                            <th>repo_tags</th>
-                            <th>machine_ip</th>
+                            <th>镜像id</th>
+                            <th>镜像标签</th>
+                            <th>机器ip</th>
                         </tr>
                         </thead>
                         <tbody>

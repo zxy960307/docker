@@ -39,10 +39,10 @@
                     <table class="table table-striped">
                         <thead>
                         <tr>
-                            <th>container_id</th>
-                            <th>status</th>
-                            <th>image</th>
-                            <th>创建者admin_id</th>
+                            <th>容器id</th>
+                            <th>状态</th>
+                            <th>镜像</th>
+                            <th>创建者id</th>
                             <th>创建时间</th>
                             <th>开放端口</th>
                             <th>ip地址</th>
